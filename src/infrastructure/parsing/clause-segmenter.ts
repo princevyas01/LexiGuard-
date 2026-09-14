@@ -80,6 +80,10 @@ export function segmentDocument(
     return { sections, clauses };
   }
 
+  // Regex hoisted outside loop to avoid per-iteration recompilation
+  const clauseRegex =
+    /(?:^|\n)(?:([0-9]+\.[0-9]+|[a-z]\))\s*([^:\n]+)?:?\s*)([^\n]+(?:\n(?![0-9]+\.[0-9]+|[a-z]\)|[A-Z]{3,})[^\n]+)*)/g;
+
   // Process formal sections
   for (let i = 0; i < sectionMatches.length; i++) {
     const current = sectionMatches[i];
@@ -87,13 +91,13 @@ export function segmentDocument(
     const sectionStart = current.index;
     const sectionEnd = next ? next.index : rawText.length;
     const sectionContent = rawText.slice(sectionStart, sectionEnd);
+    const sectionContentTrimmed = sectionContent.trim();
 
     const sectionId = `${docId}-sec-${current.sectionNumber || i + 1}`;
     const sectionClauses: Clause[] = [];
 
-    // Match sub-clauses like "1.1 Premises: Landlord leases..." or "2.2 Late Fee: If rent..."
-    const clauseRegex =
-      /(?:^|\n)(?:([0-9]+\.[0-9]+|[a-z]\))\s*([^:\n]+)?:?\s*)([^\n]+(?:\n(?![0-9]+\.[0-9]+|[a-z]\)|[A-Z]{3,})[^\n]+)*)/g;
+    // Reset regex state for each section
+    clauseRegex.lastIndex = 0;
 
     let clauseMatch: RegExpExecArray | null;
     let foundSubClauses = false;
@@ -135,13 +139,13 @@ export function segmentDocument(
       const span: TextSpan = {
         start: sectionStart,
         end: sectionEnd,
-        text: sectionContent.trim(),
+        text: sectionContentTrimmed,
       };
       const clause: Clause = {
         id: clauseId,
         clauseNumber: current.sectionNumber,
         title: current.title,
-        text: sectionContent.trim(),
+        text: sectionContentTrimmed,
         pageNumber: Math.max(1, Math.floor(sectionStart / 2500) + 1),
         sectionId,
         span,
@@ -159,7 +163,7 @@ export function segmentDocument(
       span: {
         start: sectionStart,
         end: sectionEnd,
-        text: sectionContent.trim(),
+        text: sectionContentTrimmed,
       },
     };
 

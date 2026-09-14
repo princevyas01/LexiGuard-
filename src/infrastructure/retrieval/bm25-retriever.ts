@@ -57,13 +57,28 @@ function tokenize(text: string): string[] {
     .filter((token) => token.length > 1 && !STOP_WORDS.has(token));
 }
 
+/** Posting entry: numeric clause index + precomputed term frequency */
+interface PostingEntry {
+  clauseIndex: number;
+  tf: number;
+}
+
 export class ClauseRetriever {
   public readonly document: Document;
   private readonly indexedClauses: Clause[];
-  private readonly clauseTokens = new Map<string, string[]>();
+
+  // Inverted index: term → posting list sorted by clauseIndex
+  private readonly postings = new Map<string, PostingEntry[]>();
+
+  // Precomputed per-term IDF values
+  private readonly idfValues = new Map<string, number>();
+
+  // Precomputed per-clause data (indexed by clause position)
+  private readonly clauseLengths: number[] = [];
+  private readonly lengthNorm: number[] = []; // k1 * (1 - b + b * clauseLen / avgLen)
+
+  // Forward index preserved for matchedTerms construction
   private readonly termFrequencies = new Map<string, Map<string, number>>();
-  private readonly docFreqs = new Map<string, number>();
-  private avgClauseLength = 1;
 
   constructor(document: Document) {
     this.document = document;
@@ -72,14 +87,20 @@ export class ClauseRetriever {
   }
 
   private buildIndex(): void {
+    const k1 = 1.5;
+    const b = 0.75;
     let totalLength = 0;
     const totalClauses = this.indexedClauses.length;
+    const docFreqs = new Map<string, number>();
 
-    for (const clause of this.indexedClauses) {
+    // Pass 1: tokenize, compute term frequencies, document frequencies, clause lengths
+    for (let idx = 0; idx < totalClauses; idx++) {
+      const clause = this.indexedClauses[idx];
       const fullText = `${clause.title || ''} ${clause.text}`;
       const tokens = tokenize(fullText);
-      this.clauseTokens.set(clause.id, tokens);
-      totalLength += tokens.length;
+      const tokenCount = tokens.length;
+      this.clauseLengths.push(tokenCount);
+      totalLength += tokenCount;
 
       const frequencies = new Map<string, number>();
       for (const term of tokens) {
@@ -88,11 +109,35 @@ export class ClauseRetriever {
       this.termFrequencies.set(clause.id, frequencies);
 
       for (const term of frequencies.keys()) {
-        this.docFreqs.set(term, (this.docFreqs.get(term) || 0) + 1);
+        docFreqs.set(term, (docFreqs.get(term) || 0) + 1);
       }
     }
 
-    this.avgClauseLength = totalClauses > 0 ? totalLength / totalClauses : 1;
+    const avgClauseLength = totalClauses > 0 ? totalLength / totalClauses : 1;
+
+    // Pass 2: precompute IDF values and BM25 length normalization per clause
+    for (const [term, df] of docFreqs.entries()) {
+      this.idfValues.set(term, Math.log(1 + (totalClauses - df + 0.5) / (df + 0.5)));
+    }
+
+    for (let idx = 0; idx < totalClauses; idx++) {
+      this.lengthNorm.push(k1 * (1 - b + (b * this.clauseLengths[idx]) / avgClauseLength));
+    }
+
+    // Pass 3: build inverted index (posting lists)
+    for (let idx = 0; idx < totalClauses; idx++) {
+      const clause = this.indexedClauses[idx];
+      const frequencies = this.termFrequencies.get(clause.id);
+      if (!frequencies) continue;
+      for (const [term, tf] of frequencies.entries()) {
+        let postingList = this.postings.get(term);
+        if (!postingList) {
+          postingList = [];
+          this.postings.set(term, postingList);
+        }
+        postingList.push({ clauseIndex: idx, tf });
+      }
+    }
   }
 
   public search(
@@ -107,36 +152,69 @@ export class ClauseRetriever {
     }
 
     const k1 = 1.5;
-    const b = 0.75;
-    const N = this.indexedClauses.length;
+
+    // Accumulate scores per clause using the inverted index
+    // scoreMap: clauseIndex → accumulated BM25 score
+    const scoreMap = new Map<number, number>();
+    // matchedMap: clauseIndex → matched query terms
+    const matchedMap = new Map<number, string[]>();
+
+    for (const qTerm of queryTokens) {
+      const idf = this.idfValues.get(qTerm);
+      if (idf === undefined) continue; // term not in any clause
+
+      const postingList = this.postings.get(qTerm);
+      if (!postingList) continue;
+
+      for (const posting of postingList) {
+        const numerator = posting.tf * (k1 + 1);
+        const denominator = posting.tf + this.lengthNorm[posting.clauseIndex];
+        const contribution = idf * (numerator / denominator);
+
+        const prevScore = scoreMap.get(posting.clauseIndex);
+        if (prevScore !== undefined) {
+          scoreMap.set(posting.clauseIndex, prevScore + contribution);
+        } else {
+          scoreMap.set(posting.clauseIndex, contribution);
+        }
+
+        let terms = matchedMap.get(posting.clauseIndex);
+        if (!terms) {
+          terms = [];
+          matchedMap.set(posting.clauseIndex, terms);
+        }
+        terms.push(qTerm);
+      }
+    }
+
+    // Apply clauseNumber boost
+    for (let idx = 0; idx < this.indexedClauses.length; idx++) {
+      const clause = this.indexedClauses[idx];
+      if (clause.clauseNumber && query.includes(clause.clauseNumber)) {
+        const prevScore = scoreMap.get(idx);
+        if (prevScore !== undefined) {
+          scoreMap.set(idx, prevScore + 5);
+          const terms = matchedMap.get(idx);
+          if (terms) terms.push(clause.clauseNumber);
+        } else {
+          scoreMap.set(idx, 5);
+          matchedMap.set(idx, [clause.clauseNumber]);
+        }
+      }
+    }
+
+    // Collect results in ascending clauseIndex order to preserve stable tie-breaking identical to reference
+    const matchingIndices = Array.from(scoreMap.keys()).sort((a, b) => a - b);
     const results: RetrievedClauseResult[] = [];
 
-    for (const clause of this.indexedClauses) {
-      const termCounts = this.termFrequencies.get(clause.id) || new Map<string, number>();
-      const clauseLength = (this.clauseTokens.get(clause.id) || []).length;
-
-      let score = 0;
-      const matchedTerms: string[] = [];
-
-      for (const qTerm of queryTokens) {
-        const tf = termCounts.get(qTerm) || 0;
-        if (tf <= 0) continue;
-
-        matchedTerms.push(qTerm);
-        const df = this.docFreqs.get(qTerm) || 1;
-        const idf = Math.log(1 + (N - df + 0.5) / (df + 0.5));
-        const numerator = tf * (k1 + 1);
-        const denominator = tf + k1 * (1 - b + (b * clauseLength) / this.avgClauseLength);
-        score += idf * (numerator / denominator);
-      }
-
-      if (clause.clauseNumber && query.includes(clause.clauseNumber)) {
-        score += 5;
-        matchedTerms.push(clause.clauseNumber);
-      }
-
+    for (const idx of matchingIndices) {
+      const score = scoreMap.get(idx)!;
       if (score > 0) {
-        results.push({ clause, score, matchedTerms });
+        results.push({
+          clause: this.indexedClauses[idx],
+          score,
+          matchedTerms: matchedMap.get(idx) || [],
+        });
       }
     }
 

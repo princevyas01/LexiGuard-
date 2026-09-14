@@ -12,7 +12,17 @@ function normalizeForComparison(value: string): string {
 }
 
 export class EvidenceVerifier {
-  constructor(private readonly document: Document) {}
+  /** Precomputed normalized clause text cache for O(1) fuzzy lookup */
+  private readonly normalizedClauses: Map<string, string>;
+
+  constructor(private readonly document: Document) {
+    // Precompute normalized text for all clauses during construction
+    // instead of re-normalizing on every verifySpan call
+    this.normalizedClauses = new Map();
+    for (const clause of document.clauses) {
+      this.normalizedClauses.set(clause.id, normalizeForComparison(clause.text));
+    }
+  }
 
   public verifySpan(span: Partial<EvidenceSpan>): VerificationResult {
     const base: EvidenceSpan = {
@@ -82,9 +92,11 @@ export class EvidenceVerifier {
 
     const normalizedQuote = normalizeForComparison(quote);
     if (normalizedQuote.length >= 15) {
-      const matches = this.document.clauses.filter((clause) =>
-        normalizeForComparison(clause.text).includes(normalizedQuote)
-      );
+      // Use precomputed normalized clause text instead of re-normalizing per call
+      const matches = this.document.clauses.filter((clause) => {
+        const cached = this.normalizedClauses.get(clause.id);
+        return cached !== undefined && cached.includes(normalizedQuote);
+      });
       if (matches.length === 1) {
         const clause = matches[0];
         return this.resolve(base, {

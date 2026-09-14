@@ -68,24 +68,28 @@ export async function extractPdfText(buffer: Buffer): Promise<ExtractedDocumentC
     // 2. Extract text streams between BT (Begin Text) and ET (End Text)
     const textPieces: string[] = [];
     const streamRegex = /stream[\r\n]+([\s\S]*?)[\r\n]+endstream/g;
+    // Hoist regexes outside stream loop to avoid per-iteration recompilation
+    const tjRegex = /\(([^)]+)\)\s*Tj/g;
+    const arrayRegex = /\[([^\]]+)\]\s*TJ/g;
+    const innerLiteralRegex = /\(([^)]+)\)/g;
     let streamMatch: RegExpExecArray | null;
 
     while ((streamMatch = streamRegex.exec(rawContent)) !== null) {
       const streamData = streamMatch[1];
 
       // Extract string literals in parentheses (text) Tj or TJ
-      const tjRegex = /\(([^)]+)\)\s*Tj/g;
+      tjRegex.lastIndex = 0;
       let tjMatch: RegExpExecArray | null;
       while ((tjMatch = tjRegex.exec(streamData)) !== null) {
         textPieces.push(tjMatch[1]);
       }
 
       // Extract array text in TJ arrays: [(text) 20 (more text)] TJ
-      const arrayRegex = /\[([^\]]+)\]\s*TJ/g;
+      arrayRegex.lastIndex = 0;
       let arrMatch: RegExpExecArray | null;
       while ((arrMatch = arrayRegex.exec(streamData)) !== null) {
         const innerArray = arrMatch[1];
-        const innerLiteralRegex = /\(([^)]+)\)/g;
+        innerLiteralRegex.lastIndex = 0;
         let litMatch: RegExpExecArray | null;
         while ((litMatch = innerLiteralRegex.exec(innerArray)) !== null) {
           textPieces.push(litMatch[1]);
@@ -109,11 +113,12 @@ export async function extractPdfText(buffer: Buffer): Promise<ExtractedDocumentC
       extractedText = extractedText.slice(0, MAX_EXTRACTED_CHARACTERS);
     }
 
-    // 4. Scanned/image-only document detection
-    const isScannedOrLowText = extractedText.trim().length < MIN_TEXT_CHARACTERS_FOR_SCANNED_CHECK;
+    // 4. Scanned/image-only document detection — cache trimmed text
+    const trimmedText = extractedText.trim();
+    const isScannedOrLowText = trimmedText.length < MIN_TEXT_CHARACTERS_FOR_SCANNED_CHECK;
 
     return {
-      rawText: extractedText.trim(),
+      rawText: trimmedText,
       pageCount: Math.max(1, pageCount),
       characterCount: extractedText.length,
       isScannedOrLowText,

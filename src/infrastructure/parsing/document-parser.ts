@@ -78,12 +78,12 @@ export async function parseDocument(
   // Segment raw text into sections and clauses
   const { sections, clauses } = segmentDocument(rawText, docId);
 
-  // Metadata extraction (heuristic title & party detection)
-  const lines = rawText
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0);
-  const detectedTitle = lines[0]?.slice(0, 100) || validation.normalizedFileName;
+  // Metadata extraction (heuristic title detection)
+  // Early-terminating search for first non-empty line instead of splitting entire document
+  const firstLineMatch = rawText.match(/^\s*(\S[^\r\n]*)/m);
+  const detectedTitle = firstLineMatch
+    ? firstLineMatch[1].trim().slice(0, 100)
+    : validation.normalizedFileName;
 
   const metadata: DocumentMetadata = {
     fileName: validation.normalizedFileName,

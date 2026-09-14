@@ -17,6 +17,25 @@ const ComparisonResponseSchema = z.object({
   modifiedCount: z.number().nonnegative(),
 });
 
+function normalizeTokenSet(text: string): Set<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((token) => token.length > 2)
+  );
+}
+
+function lexicalOverlapFromSets(left: Set<string>, right: Set<string>): number {
+  if (left.size === 0 || right.size === 0) return 0;
+  let intersection = 0;
+  for (const token of left) {
+    if (right.has(token)) intersection++;
+  }
+  return intersection / Math.max(left.size, right.size);
+}
+
 /**
  * Compares two documents at the semantic clause level, classifying materiality
  * and verifying every finding against version-aware EvidenceVerifier instances.
@@ -30,25 +49,23 @@ export async function compareContracts(
 Return a JSON object matching: { findings: ComparisonFinding[], summary: string, unchangedCount: number, addedCount: number, removedCount: number, modifiedCount: number }.
 Each finding: { id: string, clauseTopic: string, changeType: 'UNCHANGED' | 'ADDED' | 'REMOVED' | 'MODIFIED' | 'MOVED' | 'AMBIGUOUS', materiality: string, severity: 'HIGH_ATTENTION' | 'REVIEW_SOON' | 'LOW_CONCERN' | 'INFORMATIONAL', originalText?: string, revisedText?: string, plainLanguageExplanation: string, commercialImpact: string, sourceSpans: EvidenceSpan[] }.`;
 
-  function normalizeTokenSet(text: string): Set<string> {
-    return new Set(
-      text
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, ' ')
-        .split(/\s+/)
-        .filter((token) => token.length > 2)
-    );
+  // Precompute token sets for all clauses in both documents
+  const tokenSetCacheA = new Map<string, Set<string>>();
+  for (const clause of docA.clauses) {
+    tokenSetCacheA.set(clause.id, normalizeTokenSet(clause.text));
   }
 
-  function lexicalOverlap(a: string, b: string): number {
-    const left = normalizeTokenSet(a);
-    const right = normalizeTokenSet(b);
-    if (left.size === 0 || right.size === 0) return 0;
-    let intersection = 0;
-    for (const token of left) {
-      if (right.has(token)) intersection++;
+  const tokenSetCacheB = new Map<string, Set<string>>();
+  for (const clause of docB.clauses) {
+    tokenSetCacheB.set(clause.id, normalizeTokenSet(clause.text));
+  }
+
+  // Pre-index docB clauses by clauseNumber for O(1) lookup
+  const docBByNumber = new Map<string, (typeof docB.clauses)[number]>();
+  for (const clauseB of docB.clauses) {
+    if (clauseB.clauseNumber) {
+      docBByNumber.set(clauseB.clauseNumber, clauseB);
     }
-    return intersection / Math.max(left.size, right.size);
   }
 
   const allCandidates: Array<{
@@ -60,17 +77,32 @@ Each finding: { id: string, clauseTopic: string, changeType: 'UNCHANGED' | 'ADDE
   const usedB = new Set<string>();
 
   for (const clauseA of docA.clauses) {
-    const sameNumber = clauseA.clauseNumber
-      ? docB.clauses.find((clauseB) => clauseB.clauseNumber === clauseA.clauseNumber)
-      : undefined;
-    const best = sameNumber
-      ? { clause: sameNumber, score: 1 }
-      : docB.clauses
-          .map((clauseB) => ({
-            clause: clauseB,
-            score: lexicalOverlap(clauseA.text, clauseB.text),
-          }))
-          .sort((x, y) => y.score - x.score)[0];
+    // O(1) clause-number lookup instead of O(M) linear .find()
+    const sameNumber = clauseA.clauseNumber ? docBByNumber.get(clauseA.clauseNumber) : undefined;
+
+    let best: { clause: (typeof docB.clauses)[number]; score: number } | undefined;
+
+    if (sameNumber) {
+      best = { clause: sameNumber, score: 1 };
+    } else {
+      // Linear-max search instead of .map().sort()[0] — O(M) instead of O(M log M)
+      const tokenSetA = tokenSetCacheA.get(clauseA.id) || new Set<string>();
+      let bestScore = -1;
+      let bestClause: (typeof docB.clauses)[number] | undefined;
+
+      for (const clauseB of docB.clauses) {
+        const tokenSetB = tokenSetCacheB.get(clauseB.id) || new Set<string>();
+        const score = lexicalOverlapFromSets(tokenSetA, tokenSetB);
+        if (score > bestScore) {
+          bestScore = score;
+          bestClause = clauseB;
+        }
+      }
+
+      if (bestClause && bestScore >= 0) {
+        best = { clause: bestClause, score: bestScore };
+      }
+    }
 
     if (best && best.score >= 0.05) {
       usedB.add(best.clause.id);
@@ -98,20 +130,27 @@ Each finding: { id: string, clauseTopic: string, changeType: 'UNCHANGED' | 'ADDE
 
   allCandidates.sort((a, b) => b.score - a.score);
 
-  let candidateText = '';
+  // Build candidate text with array join instead of quadratic string concatenation
+  const fragments: string[] = [];
+  let totalLength = 0;
+
   for (const candidate of allCandidates) {
-    const fragment = [
-      candidate.a ? `[A ${candidate.a.clauseNumber || candidate.a.id}] ${candidate.a.text}` : '',
-      candidate.b ? `[B ${candidate.b.clauseNumber || candidate.b.id}] ${candidate.b.text}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n');
+    const parts: string[] = [];
+    if (candidate.a) {
+      parts.push(`[A ${candidate.a.clauseNumber || candidate.a.id}] ${candidate.a.text}`);
+    }
+    if (candidate.b) {
+      parts.push(`[B ${candidate.b.clauseNumber || candidate.b.id}] ${candidate.b.text}`);
+    }
+    const fragment = parts.join('\n');
+    const addedLength = totalLength === 0 ? fragment.length : fragment.length + 2; // +2 for '\n\n'
 
-    const next = candidateText ? `${candidateText}\n\n${fragment}` : fragment;
-
-    if (next.length > MAX_COMPARISON_DOCUMENT_CHARACTERS) break;
-    candidateText = next;
+    if (totalLength + addedLength > MAX_COMPARISON_DOCUMENT_CHARACTERS) break;
+    fragments.push(fragment);
+    totalLength += addedLength;
   }
+
+  const candidateText = fragments.join('\n\n');
 
   const comparisonPayload =
     `VERSION A: ${docA.metadata.fileName}\n` +
@@ -245,11 +284,28 @@ Each finding: { id: string, clauseTopic: string, changeType: 'UNCHANGED' | 'ADDE
     }
   }
 
-  // 4. Recompute changed counters from validated findings rather than trusting model counts
-  const addedCount = validatedFindings.filter((f) => f.changeType === 'ADDED').length;
-  const removedCount = validatedFindings.filter((f) => f.changeType === 'REMOVED').length;
-  const modifiedCount = validatedFindings.filter((f) => f.changeType === 'MODIFIED').length;
-  const unchangedCount = validatedFindings.filter((f) => f.changeType === 'UNCHANGED').length;
+  // 4. Recompute changed counters in a single pass instead of 4 separate .filter() calls
+  let addedCount = 0;
+  let removedCount = 0;
+  let modifiedCount = 0;
+  let unchangedCount = 0;
+
+  for (const f of validatedFindings) {
+    switch (f.changeType) {
+      case 'ADDED':
+        addedCount++;
+        break;
+      case 'REMOVED':
+        removedCount++;
+        break;
+      case 'MODIFIED':
+        modifiedCount++;
+        break;
+      case 'UNCHANGED':
+        unchangedCount++;
+        break;
+    }
+  }
 
   return {
     id: `cmp-${docA.id}-${docB.id}`,
