@@ -286,4 +286,43 @@ test.describe('LexiGuard End-to-End Required Flow Inventory (Flows 75-97)', () =
     const printBtn = page.getByRole('button', { name: /Print \/ Export Preparation Sheet/i });
     await expect(printBtn).toBeVisible({ timeout: 15000 });
   });
+
+  // Flow 98: Critical UI controls are actually clickable (Step 8 regression test)
+  test('flow 98: critical UI controls are actually clickable', async ({ page }) => {
+    const browserErrors: string[] = [];
+
+    page.on('pageerror', (error) => {
+      browserErrors.push(error.message);
+    });
+
+    await page.goto('/');
+
+    const documentsTab = page.getByRole('tab', { name: 'Documents' });
+    await expect(documentsTab).toBeVisible();
+    await expect(documentsTab).toBeEnabled();
+
+    const privacyTab = page.getByRole('tab', {
+      name: 'Privacy & Limits',
+    });
+
+    await privacyTab.click();
+    await expect(page.getByRole('tabpanel', { name: /Privacy/i })).toBeVisible();
+
+    await documentsTab.click();
+
+    const residentialButton = page.getByRole('button', {
+      name: /Residential Lease/i,
+    });
+
+    await expect(residentialButton).toBeVisible();
+    await expect(residentialButton).toBeEnabled();
+
+    await residentialButton.click();
+
+    await expect(page.getByRole('heading', { name: /Residential Lease/i })).toBeVisible({
+      timeout: 15000,
+    });
+
+    expect(browserErrors).toEqual([]);
+  });
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle, AlertCircle, Info, CheckCircle2 } from 'lucide-react';
-import { RiskSeverity } from '@/domain/findings/types';
+import type { RiskSeverity } from '@/domain/findings/types';
 
 interface SeverityBadgeProps {
   severity: RiskSeverity;
