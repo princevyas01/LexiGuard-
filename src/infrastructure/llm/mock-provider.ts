@@ -21,6 +21,237 @@ export class MockLLMProvider implements LLMProvider {
       system.includes('Compare two versions of an agreement') ||
       prompt.includes('Compare Version A and Version B')
     ) {
+      if (
+        prompt.toLowerCase().includes('enterprise edition') ||
+        prompt.toLowerCase().includes('cybershield') ||
+        prompt.toLowerCase().includes('acme global')
+      ) {
+        const enterpriseComparison = {
+          findings: [
+            {
+              id: 'ent-cmp-0',
+              clauseTopic: 'Invoicing and Payment Term Window',
+              changeType: 'MODIFIED',
+              materiality: 'MATERIAL_MEANING_CHANGE',
+              severity: 'REVIEW_SOON',
+              originalText:
+                'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+              revisedText:
+                'All undisputed invoices are payable within sixty (60) days of the invoice date ("Payment Due Date").',
+              plainLanguageExplanation: 'Payment grace period expanded from 30 days to 60 days.',
+              commercialImpact:
+                'Provides greater working capital flexibility and accounts payable alignment.',
+              sourceSpans: [
+                {
+                  documentId: 'doc-a',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-2',
+                  clauseId: 'cl-2.1',
+                  sourceTextSpan:
+                    'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+                  exactQuotedText:
+                    'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+                  startOffset: 0,
+                  endOffset: 103,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+                {
+                  documentId: 'doc-b',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-2',
+                  clauseId: 'cl-2.1',
+                  sourceTextSpan:
+                    'All undisputed invoices are payable within sixty (60) days of the invoice date ("Payment Due Date").',
+                  exactQuotedText:
+                    'All undisputed invoices are payable within sixty (60) days of the invoice date ("Payment Due Date").',
+                  startOffset: 0,
+                  endOffset: 102,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+              ],
+            },
+            {
+              id: 'ent-cmp-1',
+              clauseTopic: 'Late Interest and Suspension Remedy',
+              changeType: 'REMOVED',
+              materiality: 'REMOVED_PROTECTION',
+              severity: 'HIGH_ATTENTION',
+              originalText:
+                "Any undisputed amount not received by Provider within ten (10) business days following the Payment Due Date shall accrue interest at the rate of two and one-half percent (2.5%) per month. Provider reserves the right to suspend Customer's platform access if payment is delinquent by more than fifteen (15) calendar days.",
+              revisedText: '',
+              plainLanguageExplanation:
+                'Late fee penalties (2.5%/month) and platform suspension rights were completely removed in Version 2.0.',
+              commercialImpact:
+                'Eliminates aggressive operational suspension risk and recurring interest charges.',
+              sourceSpans: [
+                {
+                  documentId: 'doc-a',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-2',
+                  clauseId: 'cl-2.2',
+                  sourceTextSpan:
+                    "Any undisputed amount not received by Provider within ten (10) business days following the Payment Due Date shall accrue interest at the rate of two and one-half percent (2.5%) per month. Provider reserves the right to suspend Customer's platform access if payment is delinquent by more than fifteen (15) calendar days.",
+                  exactQuotedText:
+                    "Any undisputed amount not received by Provider within ten (10) business days following the Payment Due Date shall accrue interest at the rate of two and one-half percent (2.5%) per month. Provider reserves the right to suspend Customer's platform access if payment is delinquent by more than fifteen (15) calendar days.",
+                  startOffset: 0,
+                  endOffset: 317,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+              ],
+            },
+            {
+              id: 'ent-cmp-2',
+              clauseTopic: 'Auto-Renewal Notice Period',
+              changeType: 'MODIFIED',
+              materiality: 'MATERIAL_MEANING_CHANGE',
+              severity: 'HIGH_ATTENTION',
+              originalText:
+                'unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+              revisedText:
+                'unless either party delivers written notice of non-renewal to the other party at least sixty (60) days prior to the expiration of the then-current term.',
+              plainLanguageExplanation:
+                'Non-renewal notice window reduced from 90 days to 60 days.',
+              commercialImpact:
+                'Provides Customer an additional 30 days to evaluate contract extension.',
+              sourceSpans: [
+                {
+                  documentId: 'doc-a',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-3',
+                  clauseId: 'cl-3.2',
+                  sourceTextSpan:
+                    'This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+                  exactQuotedText:
+                    'unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+                  startOffset: 0,
+                  endOffset: 155,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+                {
+                  documentId: 'doc-b',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-3',
+                  clauseId: 'cl-3.2',
+                  sourceTextSpan:
+                    'This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least sixty (60) days prior to the expiration of the then-current term.',
+                  exactQuotedText:
+                    'unless either party delivers written notice of non-renewal to the other party at least sixty (60) days prior to the expiration of the then-current term.',
+                  startOffset: 0,
+                  endOffset: 154,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+              ],
+            },
+            {
+              id: 'ent-cmp-3',
+              clauseTopic: 'Limitation of Liability',
+              changeType: 'MODIFIED',
+              materiality: 'MATERIAL_MEANING_CHANGE',
+              severity: 'HIGH_ATTENTION',
+              originalText:
+                "Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+              revisedText:
+                "To the maximum extent permitted by applicable law, each party's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at the total amount of fees paid or payable by Customer in the twelve (12) months preceding the claim. In no event shall either party be liable for indirect, special, or consequential damages.",
+              plainLanguageExplanation:
+                'Replaced unilateral $500 cap with a balanced mutual liability cap equal to 12 months fees, and excluded consequential damages for both parties.',
+              commercialImpact:
+                'Massively reduces Customer legal exposure and levels liability risk.',
+              sourceSpans: [
+                {
+                  documentId: 'doc-a',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-7',
+                  clauseId: 'cl-7.2',
+                  sourceTextSpan:
+                    "Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+                  exactQuotedText:
+                    "Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+                  startOffset: 0,
+                  endOffset: 365,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+                {
+                  documentId: 'doc-b',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-7',
+                  clauseId: 'cl-7.2',
+                  sourceTextSpan:
+                    "To the maximum extent permitted by applicable law, each party's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at the total amount of fees paid or payable by Customer in the twelve (12) months preceding the claim. In no event shall either party be liable for indirect, special, or consequential damages.",
+                  exactQuotedText:
+                    "To the maximum extent permitted by applicable law, each party's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at the total amount of fees paid or payable by Customer in the twelve (12) months preceding the claim. In no event shall either party be liable for indirect, special, or consequential damages.",
+                  startOffset: 0,
+                  endOffset: 360,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+              ],
+            },
+            {
+              id: 'ent-cmp-4',
+              clauseTopic: 'Annual Third-Party Security Audit Rights',
+              changeType: 'ADDED',
+              materiality: 'NEW_OBLIGATION',
+              severity: 'REVIEW_SOON',
+              originalText: '',
+              revisedText:
+                "Customer shall have the right, once per calendar year upon thirty (30) days written notice, to conduct an independent third-party security audit of Provider's hosting controls and data centers.",
+              plainLanguageExplanation:
+                'New right granted to Customer to conduct annual independent third-party security audits.',
+              commercialImpact: 'Enhances security governance and compliance verification.',
+              sourceSpans: [
+                {
+                  documentId: 'doc-b',
+                  versionId: '1.0',
+                  pageNumber: 1,
+                  sectionId: 'sec-9',
+                  clauseId: 'cl-9.1',
+                  sourceTextSpan:
+                    "Customer shall have the right, once per calendar year upon thirty (30) days written notice, to conduct an independent third-party security audit of Provider's hosting controls and data centers.",
+                  exactQuotedText:
+                    "Customer shall have the right, once per calendar year upon thirty (30) days written notice, to conduct an independent third-party security audit of Provider's hosting controls and data centers.",
+                  startOffset: 0,
+                  endOffset: 195,
+                  claimType: 'DOCUMENT_FACT',
+                  confidenceState: 'DIRECTLY_STATED',
+                  evidenceSufficiencyState: 'SUFFICIENT',
+                },
+              ],
+            },
+          ],
+          summary:
+            'Version 2.0 significantly improves commercial terms for Customer: payment terms expanded to 60 days, late penalties and service suspension removed, notice window shortened to 60 days, liability capped mutually at 12 months fees, and annual third-party audit rights added.',
+          docAId: 'doc-a',
+          docBId: 'doc-b',
+          docATitle: 'Master Services Agreement v1.0',
+          docBTitle: 'Master Services Agreement v2.0',
+          unchangedCount: 0,
+          addedCount: 1,
+          removedCount: 1,
+          modifiedCount: 3,
+        };
+        return request.schema.parse(enterpriseComparison);
+      }
+
       const mockComparison = {
         findings: [
           {
@@ -281,6 +512,136 @@ export class MockLLMProvider implements LLMProvider {
         return request.schema.parse(qnaResponse);
       }
 
+      // Check if document or prompt relates to Enterprise Edition contract
+      if (
+        prompt.toLowerCase().includes('cybershield') ||
+        prompt.toLowerCase().includes('enterprise edition') ||
+        prompt.toLowerCase().includes('acme global') ||
+        prompt.toLowerCase().includes('payment due date') ||
+        prompt.toLowerCase().includes('order form')
+      ) {
+        if (
+          questionText.includes('payment') ||
+          questionText.includes('invoice') ||
+          questionText.includes('fee') ||
+          questionText.includes('late') ||
+          questionText.includes('due')
+        ) {
+          const qnaResponse = {
+            question: questionMatch
+              ? questionMatch[1].trim()
+              : 'What are the payment terms and late fees?',
+            answer:
+              'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date"). Any undisputed amount not received within ten (10) business days following the Payment Due Date accrues interest at 2.5% per month, and Provider may suspend platform access after fifteen (15) calendar days.',
+            claimType: 'DOCUMENT_FACT',
+            confidence: 'DIRECTLY_STATED',
+            isEvidenceSufficient: true,
+            supportingSpans: [
+              {
+                documentId: activeDocId,
+                versionId: activeVersionId,
+                pageNumber: 1,
+                sectionId: 'sec-2',
+                clauseId: 'cl-2.1',
+                sourceTextSpan:
+                  'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+                exactQuotedText:
+                  'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+                startOffset: 0,
+                endOffset: 103,
+                claimType: 'DOCUMENT_FACT',
+                confidenceState: 'DIRECTLY_STATED',
+                evidenceSufficiencyState: 'SUFFICIENT',
+              },
+            ],
+            legalBoundaryDisclaimer:
+              'I can explain what the document says and help you prepare questions. I cannot determine the legal outcome or replace advice from a qualified lawyer.',
+            suggestedQuestions: [
+              'What is the notice period for non-renewal?',
+              'What is the provider liability cap?',
+            ],
+          };
+          return request.schema.parse(qnaResponse);
+        }
+
+        if (
+          questionText.includes('liability') ||
+          questionText.includes('cap') ||
+          questionText.includes('damage')
+        ) {
+          const qnaResponse = {
+            question: questionMatch ? questionMatch[1].trim() : 'What is the liability cap?',
+            answer:
+              "Provider's aggregate cumulative liability is strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+            claimType: 'DOCUMENT_FACT',
+            confidence: 'DIRECTLY_STATED',
+            isEvidenceSufficient: true,
+            supportingSpans: [
+              {
+                documentId: activeDocId,
+                versionId: activeVersionId,
+                pageNumber: 1,
+                sectionId: 'sec-7',
+                clauseId: 'cl-7.2',
+                sourceTextSpan:
+                  "Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+                exactQuotedText:
+                  "Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+                startOffset: 0,
+                endOffset: 365,
+                claimType: 'DOCUMENT_FACT',
+                confidenceState: 'DIRECTLY_STATED',
+                evidenceSufficiencyState: 'SUFFICIENT',
+              },
+            ],
+            legalBoundaryDisclaimer:
+              'I can explain what the document says and help you prepare questions. I cannot determine the legal outcome or replace advice from a qualified lawyer.',
+            suggestedQuestions: [
+              'What are the payment terms?',
+              'What is the notice period for non-renewal?',
+            ],
+          };
+          return request.schema.parse(qnaResponse);
+        }
+
+        // Default to renewal / non-renewal question
+        const qnaResponse = {
+          question: questionMatch
+            ? questionMatch[1].trim()
+            : 'What is the renewal notice requirement?',
+          answer:
+            'This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+          claimType: 'DOCUMENT_FACT',
+          confidence: 'DIRECTLY_STATED',
+          isEvidenceSufficient: true,
+          supportingSpans: [
+            {
+              documentId: activeDocId,
+              versionId: activeVersionId,
+              pageNumber: 1,
+              sectionId: 'sec-3',
+              clauseId: 'cl-3.2',
+              sourceTextSpan:
+                'This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+              exactQuotedText:
+                'unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+              startOffset: 0,
+              endOffset: 155,
+              claimType: 'DOCUMENT_FACT',
+              confidenceState: 'DIRECTLY_STATED',
+              evidenceSufficiencyState: 'SUFFICIENT',
+            },
+          ],
+          legalBoundaryDisclaimer:
+            'I can explain what the document says and help you prepare questions. I cannot determine the legal outcome or replace advice from a qualified lawyer.',
+          suggestedQuestions: [
+            'What happens if payment is delinquent?',
+            'What is the provider liability cap?',
+          ],
+        };
+        return request.schema.parse(qnaResponse);
+      }
+
       // Check if question asks about late fees / rent
       if (
         questionText.includes('rent') ||
@@ -352,6 +713,222 @@ export class MockLLMProvider implements LLMProvider {
         : 'doc-contract';
     const verIdMatch = prompt.match(/Version:\s*([^\s<]+)/i);
     const activeVersionId = verIdMatch ? verIdMatch[1].trim() : '1.0';
+
+    // 0. Enterprise Agreement (00-sample-contract.txt)
+    if (
+      docText.includes('cybershield') ||
+      docText.includes('acme global') ||
+      docText.includes('enterprise edition')
+    ) {
+      const enterpriseAnalysis = {
+        findings: [
+          {
+            id: 'ent-risk-1',
+            category: 'LIABILITY',
+            severity: 'HIGH_ATTENTION',
+            title: 'Asymmetric $500 Liability Cap with Uncapped Customer Exposure',
+            plainLanguageSummary:
+              'Provider caps total aggregate liability at $500, while Customer liability remains completely uncapped for confidentiality, payment default, or unauthorized software use.',
+            whyItMatters:
+              'Customer bears catastrophic asymmetric financial and legal risk with virtually zero recourse against Provider.',
+            sourceSpans: [
+              {
+                documentId: activeDocId,
+                versionId: activeVersionId,
+                pageNumber: 1,
+                sectionId: 'sec-7',
+                clauseId: 'cl-7.2',
+                sourceTextSpan:
+                  "Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+                exactQuotedText:
+                  "Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.",
+                startOffset: 0,
+                endOffset: 365,
+                claimType: 'DOCUMENT_FACT',
+                confidenceState: 'DIRECTLY_STATED',
+                evidenceSufficiencyState: 'SUFFICIENT',
+              },
+            ],
+            affectedParty: 'Customer',
+            recommendedQuestion:
+              'Can we establish a mutual liability cap tied to 12 months of paid subscription fees and exclude consequential damages?',
+            confidence: 'DIRECTLY_STATED',
+            isVerified: true,
+          },
+          {
+            id: 'ent-risk-2',
+            category: 'AUTO_RENEWAL',
+            severity: 'HIGH_ATTENTION',
+            title: '90-Day Advance Written Notice Required for Non-Renewal',
+            plainLanguageSummary:
+              'Agreement automatically renews for successive 12-month periods unless written notice of non-renewal is delivered at least 90 days before expiration.',
+            whyItMatters:
+              'A 90-day window is unusually long; missing it locks Customer into another full year of payments.',
+            sourceSpans: [
+              {
+                documentId: activeDocId,
+                versionId: activeVersionId,
+                pageNumber: 1,
+                sectionId: 'sec-3',
+                clauseId: 'cl-3.2',
+                sourceTextSpan:
+                  'This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+                exactQuotedText:
+                  'unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+                startOffset: 0,
+                endOffset: 155,
+                claimType: 'DOCUMENT_FACT',
+                confidenceState: 'DIRECTLY_STATED',
+                evidenceSufficiencyState: 'SUFFICIENT',
+              },
+            ],
+            affectedParty: 'Customer',
+            recommendedQuestion: 'Can the non-renewal notice period be reduced to 30 or 60 days?',
+            confidence: 'DIRECTLY_STATED',
+            isVerified: true,
+          },
+          {
+            id: 'ent-risk-3',
+            category: 'PENALTIES_FEES',
+            severity: 'REVIEW_SOON',
+            title: 'Aggressive 2.5% Monthly Interest & Platform Suspension',
+            plainLanguageSummary:
+              'Delinquent balances accrue 2.5% monthly interest after 10 business days, and Provider may suspend access after 15 calendar days.',
+            whyItMatters:
+              'High penalty interest and quick suspension risk could shut down critical internal risk management operations.',
+            sourceSpans: [
+              {
+                documentId: activeDocId,
+                versionId: activeVersionId,
+                pageNumber: 1,
+                sectionId: 'sec-2',
+                clauseId: 'cl-2.2',
+                sourceTextSpan:
+                  "Any undisputed amount not received by Provider within ten (10) business days following the Payment Due Date shall accrue interest at the rate of two and one-half percent (2.5%) per month. Provider reserves the right to suspend Customer's platform access if payment is delinquent by more than fifteen (15) calendar days.",
+                exactQuotedText:
+                  "accrue interest at the rate of two and one-half percent (2.5%) per month. Provider reserves the right to suspend Customer's platform access if payment is delinquent by more than fifteen (15) calendar days.",
+                startOffset: 0,
+                endOffset: 207,
+                claimType: 'DOCUMENT_FACT',
+                confidenceState: 'DIRECTLY_STATED',
+                evidenceSufficiencyState: 'SUFFICIENT',
+              },
+            ],
+            affectedParty: 'Customer',
+            recommendedQuestion:
+              'Can we negotiate a 30-day cure period prior to any service suspension?',
+            confidence: 'DIRECTLY_STATED',
+            isVerified: true,
+          },
+        ],
+        obligations: [
+          {
+            id: 'ent-ob-1',
+            actor: 'Customer',
+            obligation:
+              'Pay all subscription and platform fees within thirty (30) days of invoice date',
+            trigger: 'Receipt of invoice',
+            deadline: 'within thirty (30) days of the invoice date',
+            status: 'MANDATORY',
+            sourceSpan: {
+              documentId: activeDocId,
+              versionId: activeVersionId,
+              pageNumber: 1,
+              sectionId: 'sec-2',
+              clauseId: 'cl-2.1',
+              sourceTextSpan:
+                'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+              exactQuotedText:
+                'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+              startOffset: 0,
+              endOffset: 103,
+              claimType: 'DOCUMENT_FACT',
+              confidenceState: 'DIRECTLY_STATED',
+              evidenceSufficiencyState: 'SUFFICIENT',
+            },
+          },
+          {
+            id: 'ent-ob-2',
+            actor: 'Customer',
+            obligation: 'Discontinue platform use and destroy or return proprietary documentation',
+            trigger: 'Termination of Agreement',
+            deadline: 'within ten (10) calendar days of the effective date of termination',
+            status: 'MANDATORY',
+            sourceSpan: {
+              documentId: activeDocId,
+              versionId: activeVersionId,
+              pageNumber: 1,
+              sectionId: 'sec-3',
+              clauseId: 'cl-3.4',
+              sourceTextSpan:
+                'Customer shall discontinue all use of the Platform and destroy or return all Provider proprietary documentation within ten (10) calendar days of the effective date of termination.',
+              exactQuotedText:
+                'Customer shall discontinue all use of the Platform and destroy or return all Provider proprietary documentation within ten (10) calendar days of the effective date of termination.',
+              startOffset: 0,
+              endOffset: 180,
+              claimType: 'DOCUMENT_FACT',
+              confidenceState: 'DIRECTLY_STATED',
+              evidenceSufficiencyState: 'SUFFICIENT',
+            },
+          },
+        ],
+        deadlines: [
+          {
+            id: 'ent-dl-1',
+            title: 'Invoice Payment Due Date',
+            dueDateOrPeriod: 'thirty (30) days of the invoice date',
+            type: 'PAYMENT_DUE_DATE',
+            actor: 'Customer',
+            consequencesOfMissing:
+              '2.5% monthly late interest accrual and platform access suspension after 15 calendar days',
+            isCalendarDate: false,
+            sourceSpan: {
+              documentId: activeDocId,
+              versionId: activeVersionId,
+              pageNumber: 1,
+              sectionId: 'sec-2',
+              clauseId: 'cl-2.1',
+              sourceTextSpan:
+                'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+              exactQuotedText:
+                'All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").',
+              startOffset: 0,
+              endOffset: 103,
+              claimType: 'DOCUMENT_FACT',
+              confidenceState: 'DIRECTLY_STATED',
+              evidenceSufficiencyState: 'SUFFICIENT',
+            },
+          },
+          {
+            id: 'ent-dl-2',
+            title: 'Automatic Non-Renewal Notice Deadline',
+            dueDateOrPeriod: 'ninety (90) days prior to the expiration of the then-current term',
+            type: 'TERMINATION_NOTICE',
+            actor: 'Customer',
+            consequencesOfMissing:
+              'Automatic renewal for successive 12-month period with recurring financial obligations',
+            isCalendarDate: false,
+            sourceSpan: {
+              documentId: activeDocId,
+              versionId: activeVersionId,
+              pageNumber: 1,
+              sectionId: 'sec-3',
+              clauseId: 'cl-3.2',
+              sourceTextSpan:
+                'This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+              exactQuotedText:
+                'unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.',
+              startOffset: 0,
+              endOffset: 155,
+              claimType: 'DOCUMENT_FACT',
+              confidenceState: 'DIRECTLY_STATED',
+              evidenceSufficiencyState: 'SUFFICIENT',
+            },
+          },
+        ],
+      };
+      return request.schema.parse(enterpriseAnalysis);
+    }
 
     // A. SaaS Agreement
     if (

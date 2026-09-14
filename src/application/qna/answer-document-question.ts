@@ -118,7 +118,7 @@ export async function answerDocumentQuestion(
     'Always include exact quoted evidence and preserve the legal-information boundary. ' +
     'Response JSON must contain fields: question, answer (string), claimType ("DOCUMENT_FACT" | "DERIVED_INTERPRETATION" | "INSUFFICIENT_EVIDENCE"), confidence ("DIRECTLY_STATED" | "STRONGLY_IMPLIED" | "NOT_FOUND"), isEvidenceSufficient (boolean), supportingSpans (array of EvidenceSpan with clauseId, exactQuotedText, startOffset, endOffset), legalBoundaryDisclaimer (string), and suggestedQuestions (string[]).';
 
-  const userGoal = `Answer: ${cleanQuestion} Document ID: ${document.id} Version: ${document.versionId}`;
+  const userGoal = `Answer: ${cleanQuestion} Document ID: ${document.id} Title: ${document.metadata.detectedTitle} Version: ${document.versionId}`;
 
   const prompt = buildIsolatedPrompt(systemInstruction, userGoal, contextSnippet);
 
