@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CheckSquare, Printer, HelpCircle, FileText } from 'lucide-react';
-import { ActionPlan } from '@/domain/action-plan/types';
+import type { ActionPlan } from '@/domain/action-plan/types';
 
 interface ActionPlanViewProps {
   actionPlan: ActionPlan;

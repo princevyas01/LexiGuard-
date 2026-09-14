@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Send, MessageSquare, ShieldCheck, HelpCircle, ExternalLink } from 'lucide-react';
-import { Document } from '@/domain/documents/types';
-import { EvidenceSpan } from '@/domain/findings/types';
-import { AskResponse } from '@/application/qna/answer-document-question';
+import type { Document } from '@/domain/documents/types';
+import type { EvidenceSpan } from '@/domain/findings/types';
+import type { AskResponse } from '@/application/qna/answer-document-question';
 import { AccessibleModal } from '../common/AccessibleModal';
 
 interface GroundedQnAViewProps {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ShieldAlert, AlertTriangle } from 'lucide-react';
-import { EscalationTrigger } from '@/domain/action-plan/types';
+import type { EscalationTrigger } from '@/domain/action-plan/types';
 
 interface LegalDisclaimerBannerProps {
   escalationTriggers?: EscalationTrigger[];
