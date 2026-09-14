@@ -4,15 +4,16 @@ import { EvidenceVerifier } from '@/infrastructure/evidence/verifier';
 
 export function validateAnalysisFindings(
   findings: AnalysisFinding[],
-  document: Document
+  document: Document,
+  verifier?: EvidenceVerifier
 ): AnalysisFinding[] {
-  const verifier = new EvidenceVerifier(document);
+  const activeVerifier = verifier ?? new EvidenceVerifier(document);
   return findings.map((finding) => {
     const verifiedSpans: EvidenceSpan[] = [];
     let hasDirectProof = false;
 
     for (const rawSpan of finding.sourceSpans) {
-      const check = verifier.verifySpan(rawSpan);
+      const check = activeVerifier.verifySpan(rawSpan);
       if (!check.isValid) continue;
       verifiedSpans.push(check.resolvedSpan);
       hasDirectProof ||= check.resolvedSpan.confidenceState === 'DIRECTLY_STATED';

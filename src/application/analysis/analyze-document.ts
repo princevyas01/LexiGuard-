@@ -10,6 +10,7 @@ import {
   verifyOutputSafety,
 } from '@/security/prompt-sanitizer';
 import { MAX_EXTRACTED_CHARACTERS } from '@/security/quotas';
+import { EvidenceVerifier } from '@/infrastructure/evidence/verifier';
 import { validateAnalysisFindings } from '../claim-validation/validate-claims';
 import { validateObligationsAndDeadlines } from '../claim-validation/validate-document-analysis';
 
@@ -74,9 +75,10 @@ Each deadline: { id: string, title: string, dueDateOrPeriod: string, type: 'NOTI
     obligations: rawObligations,
     deadlines: rawDeadlines,
   } = rawAnalysis;
-  const validatedFindings = validateAnalysisFindings(rawFindings, document);
+  const verifier = new EvidenceVerifier(document);
+  const validatedFindings = validateAnalysisFindings(rawFindings, document, verifier);
   const { obligations: validatedObligations, deadlines: validatedDeadlines } =
-    validateObligationsAndDeadlines(rawObligations, rawDeadlines, document);
+    validateObligationsAndDeadlines(rawObligations, rawDeadlines, document, verifier);
 
   return {
     documentId: document.id,

@@ -149,8 +149,25 @@ export class EvidenceVerifier {
   }
 
   private findMatchingClause(start: number, end: number) {
-    return this.document.clauses.find(
-      (clause) => clause.span.start <= start && clause.span.end >= end
-    );
+    const clauses = this.document.clauses;
+    let low = 0;
+    let high = clauses.length - 1;
+    let bestIdx = -1;
+
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      if (clauses[mid].span.start <= start) {
+        bestIdx = mid;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    if (bestIdx >= 0 && clauses[bestIdx].span.end >= end) {
+      return clauses[bestIdx];
+    }
+
+    return clauses.find((clause) => clause.span.start <= start && clause.span.end >= end);
   }
 }

@@ -23,6 +23,7 @@ export const LEGAL_ADVICE_DISCLAIMER =
   'I can explain what the document says and help you prepare questions. I cannot determine the legal outcome or replace advice from a qualified lawyer.';
 
 const retrieverCache = new BoundedLruCache<string, ClauseRetriever>(MAX_RETRIEVER_CACHE_ENTRIES);
+const verifierCache = new BoundedLruCache<string, EvidenceVerifier>(MAX_RETRIEVER_CACHE_ENTRIES);
 
 export function getCachedRetriever(document: Document): ClauseRetriever {
   const cacheKey = `${document.id}:${document.versionId}`;
@@ -35,8 +36,20 @@ export function getCachedRetriever(document: Document): ClauseRetriever {
   return retriever;
 }
 
+export function getCachedVerifier(document: Document): EvidenceVerifier {
+  const cacheKey = `${document.id}:${document.versionId}`;
+  const existing = verifierCache.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+  const verifier = new EvidenceVerifier(document);
+  verifierCache.set(cacheKey, verifier);
+  return verifier;
+}
+
 export function clearRetrieverCache(): void {
   retrieverCache.clear();
+  verifierCache.clear();
 }
 
 export function getRetrieverCacheSize(): number {
@@ -124,7 +137,7 @@ export async function answerDocumentQuestion(
     throw new Error(`Output safety violation: ${safetyCheck.warning}`);
   }
 
-  const verifier = new EvidenceVerifier(document);
+  const verifier = getCachedVerifier(document);
   const verifiedSpans = (rawResult.supportingSpans ?? []).flatMap((span) => {
     const check = verifier.verifySpan(span);
     return check.isValid ? [check.resolvedSpan] : [];

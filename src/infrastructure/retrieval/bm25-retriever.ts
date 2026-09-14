@@ -80,6 +80,9 @@ export class ClauseRetriever {
   // Forward index preserved for matchedTerms construction
   private readonly termFrequencies = new Map<string, Map<string, number>>();
 
+  // Indexed clauses possessing clause numbers for fast query-matching
+  private readonly numberedClauses: Array<{ index: number; clauseNumber: string }> = [];
+
   constructor(document: Document) {
     this.document = document;
     this.indexedClauses = document.clauses.slice(0, SECURITY_QUOTAS.MAX_INDEXED_CHUNKS);
@@ -110,6 +113,10 @@ export class ClauseRetriever {
 
       for (const term of frequencies.keys()) {
         docFreqs.set(term, (docFreqs.get(term) || 0) + 1);
+      }
+
+      if (clause.clauseNumber) {
+        this.numberedClauses.push({ index: idx, clauseNumber: clause.clauseNumber });
       }
     }
 
@@ -187,18 +194,18 @@ export class ClauseRetriever {
       }
     }
 
-    // Apply clauseNumber boost
-    for (let idx = 0; idx < this.indexedClauses.length; idx++) {
-      const clause = this.indexedClauses[idx];
-      if (clause.clauseNumber && query.includes(clause.clauseNumber)) {
-        const prevScore = scoreMap.get(idx);
+    // Apply clauseNumber boost (only inspecting clauses that possess clause numbers)
+    for (let i = 0; i < this.numberedClauses.length; i++) {
+      const item = this.numberedClauses[i];
+      if (query.includes(item.clauseNumber)) {
+        const prevScore = scoreMap.get(item.index);
         if (prevScore !== undefined) {
-          scoreMap.set(idx, prevScore + 5);
-          const terms = matchedMap.get(idx);
-          if (terms) terms.push(clause.clauseNumber);
+          scoreMap.set(item.index, prevScore + 5);
+          const terms = matchedMap.get(item.index);
+          if (terms) terms.push(item.clauseNumber);
         } else {
-          scoreMap.set(idx, 5);
-          matchedMap.set(idx, [clause.clauseNumber]);
+          scoreMap.set(item.index, 5);
+          matchedMap.set(item.index, [item.clauseNumber]);
         }
       }
     }

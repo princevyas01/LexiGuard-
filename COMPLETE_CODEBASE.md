@@ -12019,6 +12019,7 @@ import {
   verifyOutputSafety,
 } from '@/security/prompt-sanitizer';
 import { MAX_EXTRACTED_CHARACTERS } from '@/security/quotas';
+import { EvidenceVerifier } from '@/infrastructure/evidence/verifier';
 import { validateAnalysisFindings } from '../claim-validation/validate-claims';
 import { validateObligationsAndDeadlines } from '../claim-validation/validate-document-analysis';
 
@@ -12083,9 +12084,10 @@ Each deadline: { id: string, title: string, dueDateOrPeriod: string, type: 'NOTI
     obligations: rawObligations,
     deadlines: rawDeadlines,
   } = rawAnalysis;
-  const validatedFindings = validateAnalysisFindings(rawFindings, document);
+  const verifier = new EvidenceVerifier(document);
+  const validatedFindings = validateAnalysisFindings(rawFindings, document, verifier);
   const { obligations: validatedObligations, deadlines: validatedDeadlines } =
-    validateObligationsAndDeadlines(rawObligations, rawDeadlines, document);
+    validateObligationsAndDeadlines(rawObligations, rawDeadlines, document, verifier);
 
   return {
     documentId: document.id,
@@ -12112,15 +12114,16 @@ import { EvidenceVerifier } from '@/infrastructure/evidence/verifier';
 
 export function validateAnalysisFindings(
   findings: AnalysisFinding[],
-  document: Document
+  document: Document,
+  verifier?: EvidenceVerifier
 ): AnalysisFinding[] {
-  const verifier = new EvidenceVerifier(document);
+  const activeVerifier = verifier ?? new EvidenceVerifier(document);
   return findings.map((finding) => {
     const verifiedSpans: EvidenceSpan[] = [];
     let hasDirectProof = false;
 
     for (const rawSpan of finding.sourceSpans) {
-      const check = verifier.verifySpan(rawSpan);
+      const check = activeVerifier.verifySpan(rawSpan);
       if (!check.isValid) continue;
       verifiedSpans.push(check.resolvedSpan);
       hasDirectProof ||= check.resolvedSpan.confidenceState === 'DIRECTLY_STATED';
@@ -12208,17 +12211,18 @@ import { EvidenceVerifier } from '@/infrastructure/evidence/verifier';
 export function validateObligationsAndDeadlines(
   obligations: Obligation[],
   deadlines: DeadlineItem[],
-  document: Document
+  document: Document,
+  verifier?: EvidenceVerifier
 ): { obligations: Obligation[]; deadlines: DeadlineItem[] } {
-  const verifier = new EvidenceVerifier(document);
+  const activeVerifier = verifier ?? new EvidenceVerifier(document);
 
   const validObligations = obligations.flatMap((item) => {
-    const check = verifier.verifySpan(item.sourceSpan);
+    const check = activeVerifier.verifySpan(item.sourceSpan);
     return check.isValid ? [{ ...item, sourceSpan: check.resolvedSpan }] : [];
   });
 
   const validDeadlines = deadlines.flatMap((item) => {
-    const check = verifier.verifySpan(item.sourceSpan);
+    const check = activeVerifier.verifySpan(item.sourceSpan);
     if (!check.isValid) return [];
     const source = check.resolvedSpan.sourceTextSpan;
     const dueText = item.dueDateOrPeriod.trim();
@@ -12594,6 +12598,7 @@ export const LEGAL_ADVICE_DISCLAIMER =
   'I can explain what the document says and help you prepare questions. I cannot determine the legal outcome or replace advice from a qualified lawyer.';
 
 const retrieverCache = new BoundedLruCache<string, ClauseRetriever>(MAX_RETRIEVER_CACHE_ENTRIES);
+const verifierCache = new BoundedLruCache<string, EvidenceVerifier>(MAX_RETRIEVER_CACHE_ENTRIES);
 
 export function getCachedRetriever(document: Document): ClauseRetriever {
   const cacheKey = `${document.id}:${document.versionId}`;
@@ -12606,8 +12611,20 @@ export function getCachedRetriever(document: Document): ClauseRetriever {
   return retriever;
 }
 
+export function getCachedVerifier(document: Document): EvidenceVerifier {
+  const cacheKey = `${document.id}:${document.versionId}`;
+  const existing = verifierCache.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+  const verifier = new EvidenceVerifier(document);
+  verifierCache.set(cacheKey, verifier);
+  return verifier;
+}
+
 export function clearRetrieverCache(): void {
   retrieverCache.clear();
+  verifierCache.clear();
 }
 
 export function getRetrieverCacheSize(): number {
@@ -12695,7 +12712,7 @@ export async function answerDocumentQuestion(
     throw new Error(`Output safety violation: ${safetyCheck.warning}`);
   }
 
-  const verifier = new EvidenceVerifier(document);
+  const verifier = getCachedVerifier(document);
   const verifiedSpans = (rawResult.supportingSpans ?? []).flatMap((span) => {
     const check = verifier.verifySpan(span);
     return check.isValid ? [check.resolvedSpan] : [];
@@ -15474,9 +15491,26 @@ export class EvidenceVerifier {
   }
 
   private findMatchingClause(start: number, end: number) {
-    return this.document.clauses.find(
-      (clause) => clause.span.start <= start && clause.span.end >= end
-    );
+    const clauses = this.document.clauses;
+    let low = 0;
+    let high = clauses.length - 1;
+    let bestIdx = -1;
+
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      if (clauses[mid].span.start <= start) {
+        bestIdx = mid;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    if (bestIdx >= 0 && clauses[bestIdx].span.end >= end) {
+      return clauses[bestIdx];
+    }
+
+    return clauses.find((clause) => clause.span.start <= start && clause.span.end >= end);
   }
 }
 ```
@@ -17261,6 +17295,9 @@ export class ClauseRetriever {
   // Forward index preserved for matchedTerms construction
   private readonly termFrequencies = new Map<string, Map<string, number>>();
 
+  // Indexed clauses possessing clause numbers for fast query-matching
+  private readonly numberedClauses: Array<{ index: number; clauseNumber: string }> = [];
+
   constructor(document: Document) {
     this.document = document;
     this.indexedClauses = document.clauses.slice(0, SECURITY_QUOTAS.MAX_INDEXED_CHUNKS);
@@ -17291,6 +17328,10 @@ export class ClauseRetriever {
 
       for (const term of frequencies.keys()) {
         docFreqs.set(term, (docFreqs.get(term) || 0) + 1);
+      }
+
+      if (clause.clauseNumber) {
+        this.numberedClauses.push({ index: idx, clauseNumber: clause.clauseNumber });
       }
     }
 
@@ -17368,18 +17409,18 @@ export class ClauseRetriever {
       }
     }
 
-    // Apply clauseNumber boost
-    for (let idx = 0; idx < this.indexedClauses.length; idx++) {
-      const clause = this.indexedClauses[idx];
-      if (clause.clauseNumber && query.includes(clause.clauseNumber)) {
-        const prevScore = scoreMap.get(idx);
+    // Apply clauseNumber boost (only inspecting clauses that possess clause numbers)
+    for (let i = 0; i < this.numberedClauses.length; i++) {
+      const item = this.numberedClauses[i];
+      if (query.includes(item.clauseNumber)) {
+        const prevScore = scoreMap.get(item.index);
         if (prevScore !== undefined) {
-          scoreMap.set(idx, prevScore + 5);
-          const terms = matchedMap.get(idx);
-          if (terms) terms.push(clause.clauseNumber);
+          scoreMap.set(item.index, prevScore + 5);
+          const terms = matchedMap.get(item.index);
+          if (terms) terms.push(item.clauseNumber);
         } else {
-          scoreMap.set(idx, 5);
-          matchedMap.set(idx, [clause.clauseNumber]);
+          scoreMap.set(item.index, 5);
+          matchedMap.set(item.index, [item.clauseNumber]);
         }
       }
     }

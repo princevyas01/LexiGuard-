@@ -10,17 +10,18 @@ import { EvidenceVerifier } from '@/infrastructure/evidence/verifier';
 export function validateObligationsAndDeadlines(
   obligations: Obligation[],
   deadlines: DeadlineItem[],
-  document: Document
+  document: Document,
+  verifier?: EvidenceVerifier
 ): { obligations: Obligation[]; deadlines: DeadlineItem[] } {
-  const verifier = new EvidenceVerifier(document);
+  const activeVerifier = verifier ?? new EvidenceVerifier(document);
 
   const validObligations = obligations.flatMap((item) => {
-    const check = verifier.verifySpan(item.sourceSpan);
+    const check = activeVerifier.verifySpan(item.sourceSpan);
     return check.isValid ? [{ ...item, sourceSpan: check.resolvedSpan }] : [];
   });
 
   const validDeadlines = deadlines.flatMap((item) => {
-    const check = verifier.verifySpan(item.sourceSpan);
+    const check = activeVerifier.verifySpan(item.sourceSpan);
     if (!check.isValid) return [];
     const source = check.resolvedSpan.sourceTextSpan;
     const dueText = item.dueDateOrPeriod.trim();
