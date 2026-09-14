@@ -2,7 +2,7 @@
 
 This document contains the complete, up-to-date source code, configuration files, test suites, documentation, and fixtures for the LexiGuard submission.
 
-Total files documented: 101
+Total files documented: 103
 
 ## Table of Contents
 
@@ -21,92 +21,94 @@ Total files documented: 101
 13. [docs/TESTING.md](#docs-testing-md)
 14. [docs/THREAT_MODEL.md](#docs-threat-model-md)
 15. [fixtures/contracts/adversarial-contract.txt](#fixtures-contracts-adversarial-contract-txt)
-16. [fixtures/contracts/nda-v1.txt](#fixtures-contracts-nda-v1-txt)
-17. [fixtures/contracts/nda-v2.txt](#fixtures-contracts-nda-v2-txt)
-18. [fixtures/contracts/residential-lease.txt](#fixtures-contracts-residential-lease-txt)
-19. [fixtures/contracts/saas-agreement.txt](#fixtures-contracts-saas-agreement-txt)
-20. [fixtures/contracts/urgent-notice.txt](#fixtures-contracts-urgent-notice-txt)
-21. [next-env.d.ts](#next-env-d-ts)
-22. [next.config.js](#next-config-js)
-23. [package-lock.json](#package-lock-json)
-24. [package.json](#package-json)
-25. [playwright.config.ts](#playwright-config-ts)
-26. [postcss.config.js](#postcss-config-js)
-27. [scripts/verify-submission.js](#scripts-verify-submission-js)
-28. [src/app/api/analyze/route.ts](#src-app-api-analyze-route-ts)
-29. [src/app/api/ask/route.ts](#src-app-api-ask-route-ts)
-30. [src/app/api/compare/route.ts](#src-app-api-compare-route-ts)
-31. [src/app/api/ingest/route.ts](#src-app-api-ingest-route-ts)
-32. [src/app/globals.css](#src-app-globals-css)
-33. [src/app/layout.tsx](#src-app-layout-tsx)
-34. [src/app/page.tsx](#src-app-page-tsx)
-35. [src/application/action-plan/generate-action-plan.ts](#src-application-action-plan-generate-action-plan-ts)
-36. [src/application/analysis/analyze-document.ts](#src-application-analysis-analyze-document-ts)
-37. [src/application/claim-validation/validate-claims.ts](#src-application-claim-validation-validate-claims-ts)
-38. [src/application/claim-validation/validate-document-analysis.ts](#src-application-claim-validation-validate-document-analysis-ts)
-39. [src/application/comparison/compare-contracts.ts](#src-application-comparison-compare-contracts-ts)
-40. [src/application/qna/answer-document-question.ts](#src-application-qna-answer-document-question-ts)
-41. [src/components/action-plan/ActionPlanView.tsx](#src-components-action-plan-actionplanview-tsx)
-42. [src/components/ask/GroundedQnAView.tsx](#src-components-ask-groundedqnaview-tsx)
-43. [src/components/common/AccessibleModal.tsx](#src-components-common-accessiblemodal-tsx)
-44. [src/components/common/LegalDisclaimerBanner.tsx](#src-components-common-legaldisclaimerbanner-tsx)
-45. [src/components/common/SeverityBadge.tsx](#src-components-common-severitybadge-tsx)
-46. [src/components/compare/ContractComparisonView.tsx](#src-components-compare-contractcomparisonview-tsx)
-47. [src/components/documents/DocumentUploader.tsx](#src-components-documents-documentuploader-tsx)
-48. [src/components/layout/Navbar.tsx](#src-components-layout-navbar-tsx)
-49. [src/components/overview/DocumentOverview.tsx](#src-components-overview-documentoverview-tsx)
-50. [src/components/privacy/PrivacyView.tsx](#src-components-privacy-privacyview-tsx)
-51. [src/components/risks/RisksAndObligationsView.tsx](#src-components-risks-risksandobligationsview-tsx)
-52. [src/domain/action-plan/types.ts](#src-domain-action-plan-types-ts)
-53. [src/domain/comparison/types.ts](#src-domain-comparison-types-ts)
-54. [src/domain/documents/types.ts](#src-domain-documents-types-ts)
-55. [src/domain/findings/types.ts](#src-domain-findings-types-ts)
-56. [src/domain/obligations/types.ts](#src-domain-obligations-types-ts)
-57. [src/domain/schemas.ts](#src-domain-schemas-ts)
-58. [src/infrastructure/config/env.ts](#src-infrastructure-config-env-ts)
-59. [src/infrastructure/evidence/verifier.ts](#src-infrastructure-evidence-verifier-ts)
-60. [src/infrastructure/llm/gemini-provider.ts](#src-infrastructure-llm-gemini-provider-ts)
-61. [src/infrastructure/llm/mock-provider.ts](#src-infrastructure-llm-mock-provider-ts)
-62. [src/infrastructure/llm/provider-factory.ts](#src-infrastructure-llm-provider-factory-ts)
-63. [src/infrastructure/llm/provider-interface.ts](#src-infrastructure-llm-provider-interface-ts)
-64. [src/infrastructure/parsing/clause-segmenter.ts](#src-infrastructure-parsing-clause-segmenter-ts)
-65. [src/infrastructure/parsing/document-parser.ts](#src-infrastructure-parsing-document-parser-ts)
-66. [src/infrastructure/parsing/pdf-extractor.ts](#src-infrastructure-parsing-pdf-extractor-ts)
-67. [src/infrastructure/retrieval/bm25-retriever.ts](#src-infrastructure-retrieval-bm25-retriever-ts)
-68. [src/infrastructure/storage/in-memory-store.ts](#src-infrastructure-storage-in-memory-store-ts)
-69. [src/middleware.ts](#src-middleware-ts)
-70. [src/security/bounded-lru-cache.ts](#src-security-bounded-lru-cache-ts)
-71. [src/security/concurrency-gate.ts](#src-security-concurrency-gate-ts)
-72. [src/security/file-validation.ts](#src-security-file-validation-ts)
-73. [src/security/prompt-sanitizer.ts](#src-security-prompt-sanitizer-ts)
-74. [src/security/quotas.ts](#src-security-quotas-ts)
-75. [src/security/rate-limiter.ts](#src-security-rate-limiter-ts)
-76. [src/security/request-identity.ts](#src-security-request-identity-ts)
-77. [src/security/request-schemas.ts](#src-security-request-schemas-ts)
-78. [tailwind.config.ts](#tailwind-config-ts)
-79. [test/a11y/accessibility.test.tsx](#test-a11y-accessibility-test-tsx)
-80. [test/ai-eval/ai-evaluation.test.ts](#test-ai-eval-ai-evaluation-test-ts)
-81. [test/e2e/full-journey.spec.ts](#test-e2e-full-journey-spec-ts)
-82. [test/integration/comparison-pipeline.test.ts](#test-integration-comparison-pipeline-test-ts)
-83. [test/integration/ingestion-pipeline.test.ts](#test-integration-ingestion-pipeline-test-ts)
-84. [test/integration/qna-pipeline.test.ts](#test-integration-qna-pipeline-test-ts)
-85. [test/security/concurrency-gate.test.ts](#test-security-concurrency-gate-test-ts)
-86. [test/security/injection-security.test.ts](#test-security-injection-security-test-ts)
-87. [test/security/rate-limit.test.ts](#test-security-rate-limit-test-ts)
-88. [test/security/request-body-stream.test.ts](#test-security-request-body-stream-test-ts)
-89. [test/setup.ts](#test-setup-ts)
-90. [test/unit/bounded-lru-cache.test.ts](#test-unit-bounded-lru-cache-test-ts)
-91. [test/unit/clause-segmenter.test.ts](#test-unit-clause-segmenter-test-ts)
-92. [test/unit/document-store.test.ts](#test-unit-document-store-test-ts)
-93. [test/unit/env-validation.test.ts](#test-unit-env-validation-test-ts)
-94. [test/unit/evidence-verifier.test.ts](#test-unit-evidence-verifier-test-ts)
-95. [test/unit/file-validation.test.ts](#test-unit-file-validation-test-ts)
-96. [test/unit/gemini-provider-timeout.test.ts](#test-unit-gemini-provider-timeout-test-ts)
-97. [test/unit/request-schemas.test.ts](#test-unit-request-schemas-test-ts)
-98. [test/unit/retriever-efficiency.test.ts](#test-unit-retriever-efficiency-test-ts)
-99. [test/unit/validate-document-analysis.test.ts](#test-unit-validate-document-analysis-test-ts)
-100. [tsconfig.json](#tsconfig-json)
-101. [vitest.config.ts](#vitest-config-ts)
+16. [fixtures/contracts/comprehensive-test-contract-v2.txt](#fixtures-contracts-comprehensive-test-contract-v2-txt)
+17. [fixtures/contracts/comprehensive-test-contract.txt](#fixtures-contracts-comprehensive-test-contract-txt)
+18. [fixtures/contracts/nda-v1.txt](#fixtures-contracts-nda-v1-txt)
+19. [fixtures/contracts/nda-v2.txt](#fixtures-contracts-nda-v2-txt)
+20. [fixtures/contracts/residential-lease.txt](#fixtures-contracts-residential-lease-txt)
+21. [fixtures/contracts/saas-agreement.txt](#fixtures-contracts-saas-agreement-txt)
+22. [fixtures/contracts/urgent-notice.txt](#fixtures-contracts-urgent-notice-txt)
+23. [next-env.d.ts](#next-env-d-ts)
+24. [next.config.js](#next-config-js)
+25. [package-lock.json](#package-lock-json)
+26. [package.json](#package-json)
+27. [playwright.config.ts](#playwright-config-ts)
+28. [postcss.config.js](#postcss-config-js)
+29. [scripts/verify-submission.js](#scripts-verify-submission-js)
+30. [src/app/api/analyze/route.ts](#src-app-api-analyze-route-ts)
+31. [src/app/api/ask/route.ts](#src-app-api-ask-route-ts)
+32. [src/app/api/compare/route.ts](#src-app-api-compare-route-ts)
+33. [src/app/api/ingest/route.ts](#src-app-api-ingest-route-ts)
+34. [src/app/globals.css](#src-app-globals-css)
+35. [src/app/layout.tsx](#src-app-layout-tsx)
+36. [src/app/page.tsx](#src-app-page-tsx)
+37. [src/application/action-plan/generate-action-plan.ts](#src-application-action-plan-generate-action-plan-ts)
+38. [src/application/analysis/analyze-document.ts](#src-application-analysis-analyze-document-ts)
+39. [src/application/claim-validation/validate-claims.ts](#src-application-claim-validation-validate-claims-ts)
+40. [src/application/claim-validation/validate-document-analysis.ts](#src-application-claim-validation-validate-document-analysis-ts)
+41. [src/application/comparison/compare-contracts.ts](#src-application-comparison-compare-contracts-ts)
+42. [src/application/qna/answer-document-question.ts](#src-application-qna-answer-document-question-ts)
+43. [src/components/action-plan/ActionPlanView.tsx](#src-components-action-plan-actionplanview-tsx)
+44. [src/components/ask/GroundedQnAView.tsx](#src-components-ask-groundedqnaview-tsx)
+45. [src/components/common/AccessibleModal.tsx](#src-components-common-accessiblemodal-tsx)
+46. [src/components/common/LegalDisclaimerBanner.tsx](#src-components-common-legaldisclaimerbanner-tsx)
+47. [src/components/common/SeverityBadge.tsx](#src-components-common-severitybadge-tsx)
+48. [src/components/compare/ContractComparisonView.tsx](#src-components-compare-contractcomparisonview-tsx)
+49. [src/components/documents/DocumentUploader.tsx](#src-components-documents-documentuploader-tsx)
+50. [src/components/layout/Navbar.tsx](#src-components-layout-navbar-tsx)
+51. [src/components/overview/DocumentOverview.tsx](#src-components-overview-documentoverview-tsx)
+52. [src/components/privacy/PrivacyView.tsx](#src-components-privacy-privacyview-tsx)
+53. [src/components/risks/RisksAndObligationsView.tsx](#src-components-risks-risksandobligationsview-tsx)
+54. [src/domain/action-plan/types.ts](#src-domain-action-plan-types-ts)
+55. [src/domain/comparison/types.ts](#src-domain-comparison-types-ts)
+56. [src/domain/documents/types.ts](#src-domain-documents-types-ts)
+57. [src/domain/findings/types.ts](#src-domain-findings-types-ts)
+58. [src/domain/obligations/types.ts](#src-domain-obligations-types-ts)
+59. [src/domain/schemas.ts](#src-domain-schemas-ts)
+60. [src/infrastructure/config/env.ts](#src-infrastructure-config-env-ts)
+61. [src/infrastructure/evidence/verifier.ts](#src-infrastructure-evidence-verifier-ts)
+62. [src/infrastructure/llm/gemini-provider.ts](#src-infrastructure-llm-gemini-provider-ts)
+63. [src/infrastructure/llm/mock-provider.ts](#src-infrastructure-llm-mock-provider-ts)
+64. [src/infrastructure/llm/provider-factory.ts](#src-infrastructure-llm-provider-factory-ts)
+65. [src/infrastructure/llm/provider-interface.ts](#src-infrastructure-llm-provider-interface-ts)
+66. [src/infrastructure/parsing/clause-segmenter.ts](#src-infrastructure-parsing-clause-segmenter-ts)
+67. [src/infrastructure/parsing/document-parser.ts](#src-infrastructure-parsing-document-parser-ts)
+68. [src/infrastructure/parsing/pdf-extractor.ts](#src-infrastructure-parsing-pdf-extractor-ts)
+69. [src/infrastructure/retrieval/bm25-retriever.ts](#src-infrastructure-retrieval-bm25-retriever-ts)
+70. [src/infrastructure/storage/in-memory-store.ts](#src-infrastructure-storage-in-memory-store-ts)
+71. [src/middleware.ts](#src-middleware-ts)
+72. [src/security/bounded-lru-cache.ts](#src-security-bounded-lru-cache-ts)
+73. [src/security/concurrency-gate.ts](#src-security-concurrency-gate-ts)
+74. [src/security/file-validation.ts](#src-security-file-validation-ts)
+75. [src/security/prompt-sanitizer.ts](#src-security-prompt-sanitizer-ts)
+76. [src/security/quotas.ts](#src-security-quotas-ts)
+77. [src/security/rate-limiter.ts](#src-security-rate-limiter-ts)
+78. [src/security/request-identity.ts](#src-security-request-identity-ts)
+79. [src/security/request-schemas.ts](#src-security-request-schemas-ts)
+80. [tailwind.config.ts](#tailwind-config-ts)
+81. [test/a11y/accessibility.test.tsx](#test-a11y-accessibility-test-tsx)
+82. [test/ai-eval/ai-evaluation.test.ts](#test-ai-eval-ai-evaluation-test-ts)
+83. [test/e2e/full-journey.spec.ts](#test-e2e-full-journey-spec-ts)
+84. [test/integration/comparison-pipeline.test.ts](#test-integration-comparison-pipeline-test-ts)
+85. [test/integration/ingestion-pipeline.test.ts](#test-integration-ingestion-pipeline-test-ts)
+86. [test/integration/qna-pipeline.test.ts](#test-integration-qna-pipeline-test-ts)
+87. [test/security/concurrency-gate.test.ts](#test-security-concurrency-gate-test-ts)
+88. [test/security/injection-security.test.ts](#test-security-injection-security-test-ts)
+89. [test/security/rate-limit.test.ts](#test-security-rate-limit-test-ts)
+90. [test/security/request-body-stream.test.ts](#test-security-request-body-stream-test-ts)
+91. [test/setup.ts](#test-setup-ts)
+92. [test/unit/bounded-lru-cache.test.ts](#test-unit-bounded-lru-cache-test-ts)
+93. [test/unit/clause-segmenter.test.ts](#test-unit-clause-segmenter-test-ts)
+94. [test/unit/document-store.test.ts](#test-unit-document-store-test-ts)
+95. [test/unit/env-validation.test.ts](#test-unit-env-validation-test-ts)
+96. [test/unit/evidence-verifier.test.ts](#test-unit-evidence-verifier-test-ts)
+97. [test/unit/file-validation.test.ts](#test-unit-file-validation-test-ts)
+98. [test/unit/gemini-provider-timeout.test.ts](#test-unit-gemini-provider-timeout-test-ts)
+99. [test/unit/request-schemas.test.ts](#test-unit-request-schemas-test-ts)
+100. [test/unit/retriever-efficiency.test.ts](#test-unit-retriever-efficiency-test-ts)
+101. [test/unit/validate-document-analysis.test.ts](#test-unit-validate-document-analysis-test-ts)
+102. [tsconfig.json](#tsconfig-json)
+103. [vitest.config.ts](#vitest-config-ts)
 
 ---
 
@@ -1069,6 +1071,100 @@ This Agreement is executed between Delta Labs ("Company") and Malicious Corp ("C
 
 3. CONFIDENTIALITY AND SECURITY
 3.1 Legitimate Security Policy: Contractor shall maintain standard ISO 27001 data confidentiality protocols. Any unauthorized disclosure of Company assets shall trigger immediate termination.
+```
+
+---
+
+### fixtures/contracts/comprehensive-test-contract-v2.txt
+
+<a id="fixtures-contracts-comprehensive-test-contract-v2-txt"></a>
+
+```text
+MASTER SERVICES & SOFTWARE LICENSE AGREEMENT (ENTERPRISE EDITION V2.0)
+
+This Master Services and Software License Agreement ("Agreement") is made and entered into as of January 15, 2025 ("Effective Date"), by and between Acme Global Enterprises Inc., a Delaware corporation ("Customer"), and CyberShield Solutions LLC, a California limited liability company ("Provider").
+
+1. DEFINITIONS & SCOPE OF SERVICES
+1.1 Cloud Platform Services: Provider grants Customer a non-exclusive, non-transferable right to access and utilize the CyberShield Enterprise Security Intelligence Platform ("Platform") solely for Customer's internal business risk management operations.
+1.2 Professional Implementation Services: Provider shall deliver initial deployment, architecture onboarding, and administrative training in accordance with the Statement of Work executed by both parties.
+
+2. FEES, INVOICING & PAYMENT TERMS
+2.1 Payment Schedule: Customer shall pay all subscription and platform fees specified in each Order Form. All undisputed invoices are payable within sixty (60) days of the invoice date ("Payment Due Date").
+
+3. TERM, RENEWAL & TERMINATION
+3.1 Initial Term: The initial term of this Agreement shall commence on the Effective Date and continue for a period of twenty-four (24) consecutive months ("Initial Term").
+3.2 Automatic Renewal Notice: This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least sixty (60) days prior to the expiration of the then-current term.
+3.3 Termination for Cause & Cure Period: Either party may terminate this Agreement upon written notice if the other party materially breaches any provision hereof and fails to cure such breach within thirty (30) business days following receipt of written notification of the breach.
+3.4 Post-Termination Obligation: Customer shall discontinue all use of the Platform and destroy or return all Provider proprietary documentation within twenty (20) calendar days of the effective date of termination.
+
+4. CONFIDENTIALITY & DATA PROTECTION
+4.1 Duty of Confidentiality: Each party agrees to safeguard the other party's Confidential Information with at least the same degree of care it exercises with respect to its own confidential materials of like sensitivity, but in no event less than reasonable commercial care.
+4.2 Incident Response & Notification: In the event Provider confirms an unauthorized security breach impacting Customer Data, Provider shall deliver written notice to Customer within twenty-four (24) hours of verifying the security compromise.
+
+5. INTELLECTUAL PROPERTY & OWNERSHIP
+5.1 Proprietary Platform Rights: Provider exclusively owns and retains all right, title, and interest, including all patent, copyright, trade secret, and intellectual property rights, in and to the Platform and underlying analytics models.
+5.2 Customer Data Ownership: Customer exclusively owns all right, title, and interest in and to all proprietary electronic records, files, and legal documents uploaded to the Platform ("Customer Data").
+
+6. WARRANTIES & SERVICE LEVEL AGREEMENT
+6.1 Availability Commitment: Provider warrants that the Platform shall maintain an operational uptime availability of ninety-nine and nine-tenths percent (99.9%) during each calendar month, excluding scheduled maintenance.
+6.2 Exclusive Warranty Remedy: Customer's sole and exclusive remedy for any failure to meet the uptime commitment shall be the issuance of proportional service fee credits against the subsequent monthly billing cycle.
+
+7. INDEMNIFICATION & LIABILITY ALLOCATION
+7.1 Provider IP Indemnity: Provider shall defend, indemnify, and hold harmless Customer from and against third-party claims alleging that Customer's authorized use of the Platform infringes any valid United States patent or copyright.
+7.2 Mutual Bilateral Liability Cap: To the maximum extent permitted by applicable law, each party's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at the total amount of fees paid or payable by Customer in the twelve (12) months preceding the claim. In no event shall either party be liable for indirect, special, or consequential damages.
+
+8. GOVERNING LAW & DISPUTE RESOLUTION
+8.1 Governing Jurisdiction: This Agreement shall be governed by, and construed and enforced in accordance with, the laws of the State of Delaware, without regard to its conflict of law principles.
+8.2 Mandatory Arbitration: Any dispute, controversy, or claim arising out of or relating to this contract shall be settled by binding arbitration administered by the American Arbitration Association in New Castle County, Delaware.
+
+9. AUDIT RIGHTS & COMPLIANCE
+9.1 Annual Security Audit: Customer shall have the right, once per calendar year upon thirty (30) days written notice, to conduct an independent third-party security audit of Provider's hosting controls and data centers.
+```
+
+---
+
+### fixtures/contracts/comprehensive-test-contract.txt
+
+<a id="fixtures-contracts-comprehensive-test-contract-txt"></a>
+
+```text
+MASTER SERVICES & SOFTWARE LICENSE AGREEMENT (ENTERPRISE EDITION)
+
+This Master Services and Software License Agreement ("Agreement") is made and entered into as of October 1, 2024 ("Effective Date"), by and between Acme Global Enterprises Inc., a Delaware corporation ("Customer"), and CyberShield Solutions LLC, a California limited liability company ("Provider").
+
+1. DEFINITIONS & SCOPE OF SERVICES
+1.1 Cloud Platform Services: Provider grants Customer a non-exclusive, non-transferable right to access and utilize the CyberShield Enterprise Security Intelligence Platform ("Platform") solely for Customer's internal business risk management operations.
+1.2 Professional Implementation Services: Provider shall deliver initial deployment, architecture onboarding, and administrative training in accordance with the Statement of Work executed by both parties.
+
+2. FEES, INVOICING & PAYMENT TERMS
+2.1 Payment Schedule: Customer shall pay all subscription and platform fees specified in each Order Form. All undisputed invoices are payable within thirty (30) days of the invoice date ("Payment Due Date").
+2.2 Delinquent Accounts and Suspension: Any undisputed amount not received by Provider within ten (10) business days following the Payment Due Date shall accrue interest at the rate of two and one-half percent (2.5%) per month. Provider reserves the right to suspend Customer's platform access if payment is delinquent by more than fifteen (15) calendar days.
+
+3. TERM, RENEWAL & TERMINATION
+3.1 Initial Term: The initial term of this Agreement shall commence on the Effective Date and continue for a period of twenty-four (24) consecutive months ("Initial Term").
+3.2 Automatic Renewal Notice: This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least ninety (90) days prior to the expiration of the then-current term.
+3.3 Termination for Cause & Cure Period: Either party may terminate this Agreement upon written notice if the other party materially breaches any provision hereof and fails to cure such breach within fifteen (15) business days following receipt of written notification of the breach.
+3.4 Post-Termination Obligation: Customer shall discontinue all use of the Platform and destroy or return all Provider proprietary documentation within ten (10) calendar days of the effective date of termination.
+
+4. CONFIDENTIALITY & DATA PROTECTION
+4.1 Duty of Confidentiality: Each party agrees to safeguard the other party's Confidential Information with at least the same degree of care it exercises with respect to its own confidential materials of like sensitivity, but in no event less than reasonable commercial care.
+4.2 Incident Response & Notification: In the event Provider confirms an unauthorized security breach impacting Customer Data, Provider shall deliver written notice to Customer within twenty-four (24) hours of verifying the security compromise.
+
+5. INTELLECTUAL PROPERTY & OWNERSHIP
+5.1 Proprietary Platform Rights: Provider exclusively owns and retains all right, title, and interest, including all patent, copyright, trade secret, and intellectual property rights, in and to the Platform and underlying analytics models.
+5.2 Customer Data Ownership: Customer exclusively owns all right, title, and interest in and to all proprietary electronic records, files, and legal documents uploaded to the Platform ("Customer Data").
+
+6. WARRANTIES & SERVICE LEVEL AGREEMENT
+6.1 Availability Commitment: Provider warrants that the Platform shall maintain an operational uptime availability of ninety-nine and nine-tenths percent (99.9%) during each calendar month, excluding scheduled maintenance.
+6.2 Exclusive Warranty Remedy: Customer's sole and exclusive remedy for any failure to meet the uptime commitment shall be the issuance of proportional service fee credits against the subsequent monthly billing cycle.
+
+7. INDEMNIFICATION & LIABILITY ALLOCATION
+7.1 Provider IP Indemnity: Provider shall defend, indemnify, and hold harmless Customer from and against third-party claims alleging that Customer's authorized use of the Platform infringes any valid United States patent or copyright.
+7.2 Asymmetric Liability Cap: To the maximum extent permitted by applicable law, Provider's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at five hundred dollars ($500.00). In contrast, Customer's liability for breach of confidentiality, payment default, or unauthorized software use shall remain completely uncapped and shall include direct, indirect, special, and consequential damages.
+
+8. GOVERNING LAW & DISPUTE RESOLUTION
+8.1 Governing Jurisdiction: This Agreement shall be governed by, and construed and enforced in accordance with, the laws of the State of Delaware, without regard to its conflict of law principles.
+8.2 Mandatory Arbitration: Any dispute, controversy, or claim arising out of or relating to this contract shall be settled by binding arbitration administered by the American Arbitration Association in New Castle County, Delaware.
 ```
 
 ---

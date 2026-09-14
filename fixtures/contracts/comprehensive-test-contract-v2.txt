@@ -1,0 +1,39 @@
+MASTER SERVICES & SOFTWARE LICENSE AGREEMENT (ENTERPRISE EDITION V2.0)
+
+This Master Services and Software License Agreement ("Agreement") is made and entered into as of January 15, 2025 ("Effective Date"), by and between Acme Global Enterprises Inc., a Delaware corporation ("Customer"), and CyberShield Solutions LLC, a California limited liability company ("Provider").
+
+1. DEFINITIONS & SCOPE OF SERVICES
+1.1 Cloud Platform Services: Provider grants Customer a non-exclusive, non-transferable right to access and utilize the CyberShield Enterprise Security Intelligence Platform ("Platform") solely for Customer's internal business risk management operations.
+1.2 Professional Implementation Services: Provider shall deliver initial deployment, architecture onboarding, and administrative training in accordance with the Statement of Work executed by both parties.
+
+2. FEES, INVOICING & PAYMENT TERMS
+2.1 Payment Schedule: Customer shall pay all subscription and platform fees specified in each Order Form. All undisputed invoices are payable within sixty (60) days of the invoice date ("Payment Due Date").
+
+3. TERM, RENEWAL & TERMINATION
+3.1 Initial Term: The initial term of this Agreement shall commence on the Effective Date and continue for a period of twenty-four (24) consecutive months ("Initial Term").
+3.2 Automatic Renewal Notice: This Agreement shall automatically renew for successive renewal terms of twelve (12) months each, unless either party delivers written notice of non-renewal to the other party at least sixty (60) days prior to the expiration of the then-current term.
+3.3 Termination for Cause & Cure Period: Either party may terminate this Agreement upon written notice if the other party materially breaches any provision hereof and fails to cure such breach within thirty (30) business days following receipt of written notification of the breach.
+3.4 Post-Termination Obligation: Customer shall discontinue all use of the Platform and destroy or return all Provider proprietary documentation within twenty (20) calendar days of the effective date of termination.
+
+4. CONFIDENTIALITY & DATA PROTECTION
+4.1 Duty of Confidentiality: Each party agrees to safeguard the other party's Confidential Information with at least the same degree of care it exercises with respect to its own confidential materials of like sensitivity, but in no event less than reasonable commercial care.
+4.2 Incident Response & Notification: In the event Provider confirms an unauthorized security breach impacting Customer Data, Provider shall deliver written notice to Customer within twenty-four (24) hours of verifying the security compromise.
+
+5. INTELLECTUAL PROPERTY & OWNERSHIP
+5.1 Proprietary Platform Rights: Provider exclusively owns and retains all right, title, and interest, including all patent, copyright, trade secret, and intellectual property rights, in and to the Platform and underlying analytics models.
+5.2 Customer Data Ownership: Customer exclusively owns all right, title, and interest in and to all proprietary electronic records, files, and legal documents uploaded to the Platform ("Customer Data").
+
+6. WARRANTIES & SERVICE LEVEL AGREEMENT
+6.1 Availability Commitment: Provider warrants that the Platform shall maintain an operational uptime availability of ninety-nine and nine-tenths percent (99.9%) during each calendar month, excluding scheduled maintenance.
+6.2 Exclusive Warranty Remedy: Customer's sole and exclusive remedy for any failure to meet the uptime commitment shall be the issuance of proportional service fee credits against the subsequent monthly billing cycle.
+
+7. INDEMNIFICATION & LIABILITY ALLOCATION
+7.1 Provider IP Indemnity: Provider shall defend, indemnify, and hold harmless Customer from and against third-party claims alleging that Customer's authorized use of the Platform infringes any valid United States patent or copyright.
+7.2 Mutual Bilateral Liability Cap: To the maximum extent permitted by applicable law, each party's aggregate cumulative liability arising out of or related to this Agreement shall be strictly capped at the total amount of fees paid or payable by Customer in the twelve (12) months preceding the claim. In no event shall either party be liable for indirect, special, or consequential damages.
+
+8. GOVERNING LAW & DISPUTE RESOLUTION
+8.1 Governing Jurisdiction: This Agreement shall be governed by, and construed and enforced in accordance with, the laws of the State of Delaware, without regard to its conflict of law principles.
+8.2 Mandatory Arbitration: Any dispute, controversy, or claim arising out of or relating to this contract shall be settled by binding arbitration administered by the American Arbitration Association in New Castle County, Delaware.
+
+9. AUDIT RIGHTS & COMPLIANCE
+9.1 Annual Security Audit: Customer shall have the right, once per calendar year upon thirty (30) days written notice, to conduct an independent third-party security audit of Provider's hosting controls and data centers.
