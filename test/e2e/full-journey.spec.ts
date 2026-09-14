@@ -287,8 +287,10 @@ test.describe('LexiGuard End-to-End Required Flow Inventory (Flows 75-97)', () =
     await expect(printBtn).toBeVisible({ timeout: 15000 });
   });
 
-  // Flow 98: Critical UI controls are actually clickable (Step 8 regression test)
-  test('flow 98: critical UI controls are actually clickable', async ({ page }) => {
+  // Flow 98: Critical UI controls are actually clickable (14-step critical journey)
+  test('flow 98: critical UI controls are actually clickable and execute full workflow', async ({
+    page,
+  }) => {
     const browserErrors: string[] = [];
 
     page.on('pageerror', (error) => {
@@ -297,31 +299,75 @@ test.describe('LexiGuard End-to-End Required Flow Inventory (Flows 75-97)', () =
 
     await page.goto('/');
 
-    const documentsTab = page.getByRole('tab', { name: 'Documents' });
-    await expect(documentsTab).toBeVisible();
-    await expect(documentsTab).toBeEnabled();
-
-    const privacyTab = page.getByRole('tab', {
-      name: 'Privacy & Limits',
-    });
-
-    await privacyTab.click();
-    await expect(page.getByRole('tabpanel', { name: /Privacy/i })).toBeVisible();
-
-    await documentsTab.click();
-
-    const residentialButton = page.getByRole('button', {
-      name: /Residential Lease/i,
-    });
-
+    // 1. Click Residential Lease
+    const residentialButton = page.getByRole('button', { name: /Residential Lease/i });
     await expect(residentialButton).toBeVisible();
-    await expect(residentialButton).toBeEnabled();
-
     await residentialButton.click();
 
-    await expect(page.getByRole('heading', { name: /Residential Lease/i })).toBeVisible({
-      timeout: 15000,
-    });
+    // 2. Verify analysis completes and Overview renders
+    const leaseHeading = page.getByRole('heading', { name: /Residential Lease/i });
+    await expect(leaseHeading).toBeVisible({ timeout: 15000 });
+
+    // 3. Click Risks & Obligations
+    const risksTab = page.getByRole('tab', { name: 'Risks & Obligations' });
+    await risksTab.click();
+    await expect(page.locator('#panel-risks')).toBeVisible();
+
+    // 4. Click Inspect Evidence
+    const inspectEvidenceBtn = page
+      .getByRole('button', { name: /Inspect Evidence|View verified source excerpt/i })
+      .first();
+    await expect(inspectEvidenceBtn).toBeVisible();
+    await inspectEvidenceBtn.click();
+
+    // 5. Verify modal appears
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 5000 });
+
+    // 6. Press Escape
+    await page.keyboard.press('Escape');
+
+    // 7. Verify modal closes
+    await expect(dialog).toBeHidden({ timeout: 5000 });
+
+    // 8. Click Ask
+    const askTab = page.getByRole('tab', { name: 'Ask' });
+    await askTab.click();
+    await expect(page.locator('#panel-ask')).toBeVisible();
+
+    // 9. Submit a grounded legal question
+    const questionInput = page.locator('#user-legal-question');
+    await questionInput.fill('What is the penalty for late rent?');
+    const submitBtn = page.getByRole('button', { name: /Submit question/i });
+    await submitBtn.click();
+
+    // 10. Verify answer
+    await expect(page.getByText('DOCUMENT FACT', { exact: true })).toBeVisible({ timeout: 15000 });
+
+    // 11. Click Compare
+    const compareTab = page.getByRole('tab', { name: 'Compare' });
+    await compareTab.click();
+    await expect(page.locator('#panel-compare')).toBeVisible();
+
+    // 12. Run NDA comparison
+    const runCompareBtn = page.getByRole('button', { name: /Run Side-by-Side Comparison/i });
+    if (await runCompareBtn.isVisible()) {
+      await runCompareBtn.click();
+      await expect(page.getByText(/Side-by-Side Semantic Diff/i)).toBeVisible({ timeout: 15000 });
+    }
+
+    // 13. Click Privacy
+    const privacyTab = page.getByRole('tab', { name: 'Privacy & Limits' });
+    await privacyTab.click();
+    await expect(page.locator('#panel-privacy')).toBeVisible();
+
+    // 14. Clear session memory
+    const clearSessionBtn = page.getByRole('button', { name: /Clear Session Memory/i });
+    await clearSessionBtn.click();
+    await expect(page.getByRole('tab', { name: 'Documents' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
 
     expect(browserErrors).toEqual([]);
   });

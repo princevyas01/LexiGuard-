@@ -2,7 +2,7 @@
 
 This document contains the complete, up-to-date source code, configuration files, test suites, documentation, and fixtures for the LexiGuard submission.
 
-Total files documented: 97
+Total files documented: 101
 
 ## Table of Contents
 
@@ -74,35 +74,39 @@ Total files documented: 97
 66. [src/infrastructure/parsing/pdf-extractor.ts](#src-infrastructure-parsing-pdf-extractor-ts)
 67. [src/infrastructure/retrieval/bm25-retriever.ts](#src-infrastructure-retrieval-bm25-retriever-ts)
 68. [src/infrastructure/storage/in-memory-store.ts](#src-infrastructure-storage-in-memory-store-ts)
-69. [src/security/bounded-lru-cache.ts](#src-security-bounded-lru-cache-ts)
-70. [src/security/concurrency-gate.ts](#src-security-concurrency-gate-ts)
-71. [src/security/file-validation.ts](#src-security-file-validation-ts)
-72. [src/security/prompt-sanitizer.ts](#src-security-prompt-sanitizer-ts)
-73. [src/security/quotas.ts](#src-security-quotas-ts)
-74. [src/security/rate-limiter.ts](#src-security-rate-limiter-ts)
-75. [src/security/request-identity.ts](#src-security-request-identity-ts)
-76. [src/security/request-schemas.ts](#src-security-request-schemas-ts)
-77. [tailwind.config.ts](#tailwind-config-ts)
-78. [test/a11y/accessibility.test.tsx](#test-a11y-accessibility-test-tsx)
-79. [test/ai-eval/ai-evaluation.test.ts](#test-ai-eval-ai-evaluation-test-ts)
-80. [test/e2e/full-journey.spec.ts](#test-e2e-full-journey-spec-ts)
-81. [test/integration/comparison-pipeline.test.ts](#test-integration-comparison-pipeline-test-ts)
-82. [test/integration/ingestion-pipeline.test.ts](#test-integration-ingestion-pipeline-test-ts)
-83. [test/integration/qna-pipeline.test.ts](#test-integration-qna-pipeline-test-ts)
-84. [test/security/concurrency-gate.test.ts](#test-security-concurrency-gate-test-ts)
-85. [test/security/injection-security.test.ts](#test-security-injection-security-test-ts)
-86. [test/security/rate-limit.test.ts](#test-security-rate-limit-test-ts)
-87. [test/setup.ts](#test-setup-ts)
-88. [test/unit/bounded-lru-cache.test.ts](#test-unit-bounded-lru-cache-test-ts)
-89. [test/unit/clause-segmenter.test.ts](#test-unit-clause-segmenter-test-ts)
-90. [test/unit/document-store.test.ts](#test-unit-document-store-test-ts)
-91. [test/unit/env-validation.test.ts](#test-unit-env-validation-test-ts)
-92. [test/unit/evidence-verifier.test.ts](#test-unit-evidence-verifier-test-ts)
-93. [test/unit/file-validation.test.ts](#test-unit-file-validation-test-ts)
-94. [test/unit/request-schemas.test.ts](#test-unit-request-schemas-test-ts)
-95. [test/unit/validate-document-analysis.test.ts](#test-unit-validate-document-analysis-test-ts)
-96. [tsconfig.json](#tsconfig-json)
-97. [vitest.config.ts](#vitest-config-ts)
+69. [src/middleware.ts](#src-middleware-ts)
+70. [src/security/bounded-lru-cache.ts](#src-security-bounded-lru-cache-ts)
+71. [src/security/concurrency-gate.ts](#src-security-concurrency-gate-ts)
+72. [src/security/file-validation.ts](#src-security-file-validation-ts)
+73. [src/security/prompt-sanitizer.ts](#src-security-prompt-sanitizer-ts)
+74. [src/security/quotas.ts](#src-security-quotas-ts)
+75. [src/security/rate-limiter.ts](#src-security-rate-limiter-ts)
+76. [src/security/request-identity.ts](#src-security-request-identity-ts)
+77. [src/security/request-schemas.ts](#src-security-request-schemas-ts)
+78. [tailwind.config.ts](#tailwind-config-ts)
+79. [test/a11y/accessibility.test.tsx](#test-a11y-accessibility-test-tsx)
+80. [test/ai-eval/ai-evaluation.test.ts](#test-ai-eval-ai-evaluation-test-ts)
+81. [test/e2e/full-journey.spec.ts](#test-e2e-full-journey-spec-ts)
+82. [test/integration/comparison-pipeline.test.ts](#test-integration-comparison-pipeline-test-ts)
+83. [test/integration/ingestion-pipeline.test.ts](#test-integration-ingestion-pipeline-test-ts)
+84. [test/integration/qna-pipeline.test.ts](#test-integration-qna-pipeline-test-ts)
+85. [test/security/concurrency-gate.test.ts](#test-security-concurrency-gate-test-ts)
+86. [test/security/injection-security.test.ts](#test-security-injection-security-test-ts)
+87. [test/security/rate-limit.test.ts](#test-security-rate-limit-test-ts)
+88. [test/security/request-body-stream.test.ts](#test-security-request-body-stream-test-ts)
+89. [test/setup.ts](#test-setup-ts)
+90. [test/unit/bounded-lru-cache.test.ts](#test-unit-bounded-lru-cache-test-ts)
+91. [test/unit/clause-segmenter.test.ts](#test-unit-clause-segmenter-test-ts)
+92. [test/unit/document-store.test.ts](#test-unit-document-store-test-ts)
+93. [test/unit/env-validation.test.ts](#test-unit-env-validation-test-ts)
+94. [test/unit/evidence-verifier.test.ts](#test-unit-evidence-verifier-test-ts)
+95. [test/unit/file-validation.test.ts](#test-unit-file-validation-test-ts)
+96. [test/unit/gemini-provider-timeout.test.ts](#test-unit-gemini-provider-timeout-test-ts)
+97. [test/unit/request-schemas.test.ts](#test-unit-request-schemas-test-ts)
+98. [test/unit/retriever-efficiency.test.ts](#test-unit-retriever-efficiency-test-ts)
+99. [test/unit/validate-document-analysis.test.ts](#test-unit-validate-document-analysis-test-ts)
+100. [tsconfig.json](#tsconfig-json)
+101. [vitest.config.ts](#vitest-config-ts)
 
 ---
 
@@ -479,7 +483,7 @@ npm run dev
 | **Code Quality** | Strict TypeScript (`noImplicitAny`, zero `any`), ESLint 0 warnings, layered architecture (`src/domain/`, `src/application/`, `src/infrastructure/`). | **Verified Pass** |
 | **Security** | Magic-byte file validation, ZIP-bomb protection, XML prompt injection containment, CSP headers, zero secrets in git. | **Verified Pass** |
 | **Efficiency** | Lightweight pure TS parsing, BM25 retrieval, sub-second responses, bounded memory and token quotas. | **Verified Pass** |
-| **Testing** | 73 Vitest tests + 23 Playwright flows across unit, integration, security, axe accessibility, and AI evaluation benchmarks. | **Verified Pass** |
+| **Testing** | 87 Vitest tests + 24 Playwright flows (111 tests total) across unit, integration, security, axe accessibility, and AI evaluation benchmarks. | **Verified Pass** |
 | **Accessibility** | WCAG 2.2 AA technical baseline, automated `axe-core` 0 violations, keyboard focus trap/restoration, non-color-only risk tags. | **Verified Pass** |
 | **Product Utility** | 5 core legal workflows, two-column plain language explanations, obligations table, and lawyer consultation sheet. | **Verified Pass** |
 | **AI Reliability** | 6-layer hallucination control, exact verbatim quote verifier, deterministic refusal on unmentioned topics, strict boundary disclaimers. | **Verified Pass** |
@@ -869,7 +873,8 @@ LexiGuard uses **OWASP ASVS 5.0** (Application Security Verification Standard) a
   - DOCX files must begin with the ZIP PK signature (`0x50, 0x4B, 0x03, 0x04`).
   - Plain text files must contain valid UTF-8/ASCII bytes and zero null bytes (`0x00`).
 - **Path Traversal & Filename Sanitization**: Filenames are normalized with Unicode NFKC, stripped of control characters, and purged of directory traversal sequences (`../`, `..\`).
-- **Resource Bounds & ZIP Bomb Defense**:
+- **Resource Bounds & Streaming Body Limit**:
+  - Byte-level streaming request limit: strictly 6 MB (`MAX_REQUEST_BODY_BYTES`) via `createBoundedBodyRequest` with early reader cancellation upon quota breach.
   - Upload limit: strictly 5 MB.
   - DOCX archive decompression limit: 20 MB max, ratio < 10:1.
   - Maximum document page limit: 50 pages.
@@ -883,15 +888,16 @@ LexiGuard uses **OWASP ASVS 5.0** (Application Security Verification Standard) a
 - **Passive Document Principle**: All document text is framed as passive legal text; documents have zero authority to invoke tools, override developer directives, or trigger privileged actions.
 - **Output Leakage Guard**: Generated model output is scanned for system prompt confidentiality breaches before being rendered.
 
-### 2.3 Secret Management & Logging Hygiene
+### 2.3 Secret Management, Logging Hygiene & Provider Timeouts
 
 - **Zero Hardcoded Secrets**: Configuration is validated once via `src/infrastructure/config/env.ts` using Zod.
 - **Server-Side Isolation**: External LLM keys (`GEMINI_API_KEY`) remain strictly on the Node.js server and are never serialized to client bundles.
 - **Payload-Free Logging**: Application logs record only timing, HTTP status codes, and anonymized correlation IDs. Raw contract texts, user questions, and API keys are strictly excluded from logs.
+- **Bounded Operation Timeouts**: Both structured and text LLM operations are bounded by `OPERATION_TIMEOUT_MS` (30s) with guaranteed `clearTimeout` cleanup in `finally` blocks, leaving zero orphaned timer handles.
 
-### 2.4 Browser Security Headers (`next.config.js`)
+### 2.4 Browser Security Headers & Nonce CSP (`src/middleware.ts`)
 
-- `Content-Security-Policy`: Restricts script and connection origins.
+- `Content-Security-Policy`: Centralized per-request nonce-based CSP with `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, and `frame-ancestors 'none'`.
 - `X-Frame-Options: DENY`: Defends against clickjacking.
 - `X-Content-Type-Options: nosniff`: Prevents MIME-sniffing.
 - `Referrer-Policy: strict-origin-when-cross-origin`: Minimizes referrer leakage.
@@ -935,25 +941,29 @@ Testing in LexiGuard is not "write a few tests." The project implements a comple
 
 ---
 
-## 3. Test Suites & Descriptions (96 Automated Tests Total: 73 Vitest + 23 Playwright)
+## 3. Test Suites & Descriptions (111 Automated Tests Total: 87 Vitest + 24 Playwright)
 
-| Test Suite                     | Path                                           | Primary Purpose & Coverage                                                                                                         |
-| :----------------------------- | :--------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
-| **Unit: File Validation**      | `test/unit/file-validation.test.ts`            | Tests magic-byte verification (`%PDF-`, `PK\x03\x04`), 5MB size limits, and path traversal sanitization (`../../`).                |
-| **Unit: Clause Segmenter**     | `test/unit/clause-segmenter.test.ts`           | Tests section header parsing, clause numbering, and exact character offset preservation.                                           |
-| **Unit: Evidence Verifier**    | `test/unit/evidence-verifier.test.ts`          | Tests verbatim substring matching, offset resolution, and rejection of hallucinated quotes.                                        |
-| **Unit: Request Schemas**      | `test/unit/request-schemas.test.ts`            | Tests strict Zod validation across boundary payloads, query lengths, and document IDs.                                             |
-| **Unit: Environment Config**   | `test/unit/env-validation.test.ts`             | Tests fail-closed environment validation, default fallback values, and provider enforcement.                                       |
-| **Unit: Document Store**       | `test/unit/document-store.test.ts`             | Tests ephemeral in-memory document store bounded capacity and monotonic LRU cache eviction.                                        |
-| **Unit: Analysis Validation**  | `test/unit/validate-document-analysis.test.ts` | Tests verification pipeline filtering out ungrounded obligations and unverified deadlines.                                         |
-| **Security: Prompt Injection** | `test/security/injection-security.test.ts`     | Tests direct injection, jailbreak keywords, XML delimiter escaping, and output leakage guards.                                     |
-| **Security: Rate Limiter**     | `test/security/rate-limit.test.ts`             | Tests token bucket rate limiting, quota exhaustion, and independent IP tracking.                                                   |
-| **Integration: Ingestion**     | `test/integration/ingestion-pipeline.test.ts`  | Tests end-to-end pipeline: raw file buffer ➔ parser ➔ segmenter ➔ LLM ➔ claim verification.                                        |
-| **Integration: Q&A**           | `test/integration/qna-pipeline.test.ts`        | Tests BM25 clause retrieval, grounded answers with citations, and missing evidence refusals.                                       |
-| **Integration: Comparison**    | `test/integration/comparison-pipeline.test.ts` | Tests semantic diffing between NDA v1 and v2, added non-competes, and deleted indemnities.                                         |
-| **Accessibility: Axe-Core**    | `test/a11y/accessibility.test.tsx`             | Tests automated axe rules on `SeverityBadge`, `LegalDisclaimerBanner`, and `AccessibleModal`.                                      |
-| **AI Evaluation Benchmark**    | `test/ai-eval/ai-evaluation.test.ts`           | Tests deterministic grounding regression: 100% schema validity, $\ge 95\%$ citation verification, and refusal on missing evidence. |
-| **Playwright E2E**             | `test/e2e/full-journey.spec.ts`                | Tests 23 complete user journeys (Flows 75-97) covering upload, analysis, citations, modal traps, 320px, and print.                 |
+| Test Suite                        | Path                                           | Primary Purpose & Coverage                                                                                                           |
+| :-------------------------------- | :--------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| **Unit: File Validation**         | `test/unit/file-validation.test.ts`            | Tests magic-byte verification (`%PDF-`, `PK\x03\x04`), 5MB size limits, and path traversal sanitization (`../../`).                  |
+| **Unit: Clause Segmenter**        | `test/unit/clause-segmenter.test.ts`           | Tests section header parsing, clause numbering, and exact character offset preservation.                                             |
+| **Unit: Evidence Verifier**       | `test/unit/evidence-verifier.test.ts`          | Tests verbatim substring matching, offset resolution, and rejection of hallucinated quotes.                                          |
+| **Unit: Request Schemas**         | `test/unit/request-schemas.test.ts`            | Tests strict Zod validation across boundary payloads, query lengths, and document IDs.                                               |
+| **Unit: Environment Config**      | `test/unit/env-validation.test.ts`             | Tests fail-closed environment validation, default fallback values, and provider enforcement.                                         |
+| **Unit: Document Store**          | `test/unit/document-store.test.ts`             | Tests ephemeral in-memory document store bounded capacity and monotonic LRU cache eviction.                                          |
+| **Unit: Analysis Validation**     | `test/unit/validate-document-analysis.test.ts` | Tests verification pipeline filtering out ungrounded obligations and unverified deadlines.                                           |
+| **Unit: Gemini Provider**         | `test/unit/gemini-provider-timeout.test.ts`    | Tests bounded timers on structured/text generation, retry cleanup, zero orphaned timers.                                             |
+| **Unit: Retriever Efficiency**    | `test/unit/retriever-efficiency.test.ts`       | Tests BM25 precomputed term frequencies vs unoptimized reference over 2,000 clauses, asserting speedup and identical scoring.        |
+| **Security: Request Body Stream** | `test/security/request-body-stream.test.ts`    | Tests byte-level streaming request limits, stream cancellation upon quota breach, and oversize rejection.                            |
+| **Security: Prompt Injection**    | `test/security/injection-security.test.ts`     | Tests direct injection, jailbreak keywords, XML delimiter escaping, and output leakage guards.                                       |
+| **Security: Rate Limiter**        | `test/security/rate-limit.test.ts`             | Tests token bucket rate limiting, quota exhaustion, and independent IP tracking.                                                     |
+| **Security: Concurrency Gate**    | `test/security/concurrency-gate.test.ts`       | Tests bounded concurrent execution limits and graceful 503 rejection under load.                                                     |
+| **Integration: Ingestion**        | `test/integration/ingestion-pipeline.test.ts`  | Tests end-to-end pipeline: raw file buffer ➔ parser ➔ segmenter ➔ LLM ➔ claim verification.                                          |
+| **Integration: Q&A**              | `test/integration/qna-pipeline.test.ts`        | Tests BM25 clause retrieval, grounded answers with citations, and missing evidence refusals.                                         |
+| **Integration: Comparison**       | `test/integration/comparison-pipeline.test.ts` | Tests semantic diffing between NDA v1 and v2, added non-competes, and deleted indemnities.                                           |
+| **Accessibility: Axe-Core**       | `test/a11y/accessibility.test.tsx`             | Tests automated axe rules on `SeverityBadge`, `LegalDisclaimerBanner`, and `AccessibleModal`.                                        |
+| **AI Evaluation Benchmark**       | `test/ai-eval/ai-evaluation.test.ts`           | Tests deterministic grounding regression: 100% schema validity, $\ge 95\%$ citation verification, and refusal on missing evidence.   |
+| **Playwright E2E**                | `test/e2e/full-journey.spec.ts`                | Tests 24 complete user journeys (Flows 75-98) covering upload, analysis, citations, modal traps, 320px, and 14-step browser journey. |
 
 ---
 
@@ -1242,48 +1252,9 @@ Authorized Legal Agent for Landlord
 <a id="next-config-js"></a>
 
 ```javascript
-const isDev = process.env.NODE_ENV !== 'production';
-
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  headers: async () => [
-    {
-      source: '/(.*)',
-      headers: [
-        {
-          key: 'Content-Security-Policy',
-          value: [
-            "default-src 'self'",
-            isDev ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self' 'unsafe-inline'",
-            "style-src 'self' 'unsafe-inline'",
-            "img-src 'self' data: blob:",
-            "font-src 'self'",
-            "connect-src 'self' https://generativelanguage.googleapis.com",
-            "frame-ancestors 'none'",
-            "base-uri 'self'",
-            "form-action 'self'",
-          ].join('; '),
-        },
-        {
-          key: 'X-Frame-Options',
-          value: 'DENY',
-        },
-        {
-          key: 'X-Content-Type-Options',
-          value: 'nosniff',
-        },
-        {
-          key: 'Referrer-Policy',
-          value: 'strict-origin-when-cross-origin',
-        },
-        {
-          key: 'Permissions-Policy',
-          value: 'camera=(), microphone=(), geolocation=()',
-        },
-      ],
-    },
-  ],
 };
 
 module.exports = nextConfig;
@@ -11060,6 +11031,7 @@ export default defineConfig({
     timeout: 120000,
     env: {
       RATE_LIMIT_PER_MINUTE: '500',
+      LLM_PROVIDER: 'mock',
     },
   },
   projects: [
@@ -11449,7 +11421,7 @@ import { globalRateLimiter } from '@/security/rate-limiter';
 import { extractClientIdentity } from '@/security/request-identity';
 import {
   SampleRequestSchema,
-  enforceRequestBodySizeLimit,
+  createBoundedBodyRequest,
   parseBoundedJson,
 } from '@/security/request-schemas';
 import { ConcurrencyLimitError, globalConcurrencyGate } from '@/security/concurrency-gate';
@@ -11503,17 +11475,15 @@ export async function POST(req: NextRequest) {
 
     // B. File Upload (FormData)
     if (contentType.includes('multipart/form-data')) {
-      enforceRequestBodySizeLimit(req);
-      const formData = await req.formData();
+      const boundedRequest = createBoundedBodyRequest(req);
+      const formData = await boundedRequest.formData();
       const file = formData.get('file') as File | null;
 
       if (!file) {
         return NextResponse.json({ error: 'No file was provided in the upload.' }, { status: 400 });
       }
 
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-
+      const buffer = Buffer.from(await file.arrayBuffer());
       const validation = validateUploadedFile(buffer, file.name, file.type);
       const document = await globalConcurrencyGate.run(async () => {
         const parsedDocument = await parseDocument(buffer, validation);
@@ -11619,6 +11589,7 @@ export async function POST(req: NextRequest) {
 
 ```typescript
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -11628,6 +11599,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  headers().get('x-nonce');
+
   return (
     <html lang="en" className="h-full">
       <body className="h-full flex flex-col antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-950">
@@ -15464,7 +15437,7 @@ export class GeminiLLMProvider implements LLMProvider {
   private client: GoogleGenerativeAI;
   private modelName: string;
 
-  constructor(apiKey: string, modelName = 'gemini-2.5-flash') {
+  constructor(apiKey: string, modelName = 'gemini-1.5-flash') {
     if (!apiKey) {
       throw new GeminiProviderError('GEMINI_API_KEY is required for GeminiLLMProvider');
     }
@@ -15490,13 +15463,14 @@ export class GeminiLLMProvider implements LLMProvider {
 
     while (attempts <= maxRetries) {
       attempts++;
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
       try {
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(
             () => reject(new GeminiProviderError('Gemini request timed out.')),
             SECURITY_QUOTAS.OPERATION_TIMEOUT_MS
-          )
-        );
+          );
+        });
 
         const resultPromise = model.generateContent(fullPrompt);
         const response = await Promise.race([resultPromise, timeoutPromise]);
@@ -15522,6 +15496,10 @@ export class GeminiLLMProvider implements LLMProvider {
         }
       } catch (err) {
         lastError = err instanceof Error ? err : new GeminiProviderError(String(err));
+      } finally {
+        if (timeoutId !== undefined) {
+          clearTimeout(timeoutId);
+        }
       }
     }
 
@@ -15540,13 +15518,25 @@ export class GeminiLLMProvider implements LLMProvider {
     });
 
     const fullPrompt = `${request.systemPrompt}\n\n${request.userPrompt}`;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
-      const response = await model.generateContent(fullPrompt);
+      const resultPromise = model.generateContent(fullPrompt);
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(
+          () => reject(new GeminiProviderError('Gemini text request timed out.')),
+          SECURITY_QUOTAS.OPERATION_TIMEOUT_MS
+        );
+      });
+      const response = await Promise.race([resultPromise, timeoutPromise]);
       return response.response.text();
     } catch (err) {
       throw new GeminiProviderError(
         `Gemini text generation failed: ${err instanceof Error ? err.message : String(err)}`
       );
+    } finally {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
     }
   }
 }
@@ -17107,60 +17097,61 @@ export interface RetrievedClauseResult {
   matchedTerms: string[];
 }
 
-function tokenize(text: string): string[] {
-  const stopWords = new Set([
-    'a',
-    'an',
-    'the',
-    'and',
-    'or',
-    'but',
-    'if',
-    'then',
-    'else',
-    'when',
-    'at',
-    'by',
-    'from',
-    'for',
-    'in',
-    'out',
-    'on',
-    'off',
-    'over',
-    'under',
-    'to',
-    'of',
-    'up',
-    'down',
-    'with',
-    'as',
-    'is',
-    'are',
-    'was',
-    'were',
-    'be',
-    'been',
-    'being',
-    'have',
-    'has',
-    'had',
-    'do',
-    'does',
-    'did',
-  ]);
+const STOP_WORDS = new Set([
+  'a',
+  'an',
+  'the',
+  'and',
+  'or',
+  'but',
+  'if',
+  'then',
+  'else',
+  'when',
+  'at',
+  'by',
+  'from',
+  'for',
+  'in',
+  'out',
+  'on',
+  'off',
+  'over',
+  'under',
+  'to',
+  'of',
+  'up',
+  'down',
+  'with',
+  'as',
+  'is',
+  'are',
+  'was',
+  'were',
+  'be',
+  'been',
+  'being',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+]);
 
+function tokenize(text: string): string[] {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter((token) => token.length > 1 && !stopWords.has(token));
+    .filter((token) => token.length > 1 && !STOP_WORDS.has(token));
 }
 
 export class ClauseRetriever {
   public readonly document: Document;
   private readonly indexedClauses: Clause[];
   private readonly clauseTokens = new Map<string, string[]>();
+  private readonly termFrequencies = new Map<string, Map<string, number>>();
   private readonly docFreqs = new Map<string, number>();
   private avgClauseLength = 1;
 
@@ -17180,7 +17171,13 @@ export class ClauseRetriever {
       this.clauseTokens.set(clause.id, tokens);
       totalLength += tokens.length;
 
-      for (const term of new Set(tokens)) {
+      const frequencies = new Map<string, number>();
+      for (const term of tokens) {
+        frequencies.set(term, (frequencies.get(term) || 0) + 1);
+      }
+      this.termFrequencies.set(clause.id, frequencies);
+
+      for (const term of frequencies.keys()) {
         this.docFreqs.set(term, (this.docFreqs.get(term) || 0) + 1);
       }
     }
@@ -17205,13 +17202,8 @@ export class ClauseRetriever {
     const results: RetrievedClauseResult[] = [];
 
     for (const clause of this.indexedClauses) {
-      const tokens = this.clauseTokens.get(clause.id) || [];
-      const clauseLength = tokens.length;
-      const termCounts = new Map<string, number>();
-
-      for (const token of tokens) {
-        termCounts.set(token, (termCounts.get(token) || 0) + 1);
-      }
+      const termCounts = this.termFrequencies.get(clause.id) || new Map<string, number>();
+      const clauseLength = (this.clauseTokens.get(clause.id) || []).length;
 
       let score = 0;
       const matchedTerms: string[] = [];
@@ -17338,6 +17330,68 @@ const globalForStore = globalThis as unknown as {
 export const documentStore = globalForStore.documentStore ?? new InMemoryDocumentStore();
 
 globalForStore.documentStore = documentStore;
+```
+
+---
+
+### src/middleware.ts
+
+<a id="src-middleware-ts"></a>
+
+```typescript
+﻿import { NextRequest, NextResponse } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const isDev = process.env.NODE_ENV !== 'production';
+
+  const scriptSrc = isDev
+    ? `'self' 'unsafe-inline' 'unsafe-eval'`
+    : `'self' 'nonce-${nonce}' 'strict-dynamic'`;
+
+  const cspHeader = [
+    `default-src 'self'`,
+    `script-src ${scriptSrc}`,
+    `style-src 'self' 'unsafe-inline'`,
+    `img-src 'self' data: blob:`,
+    `font-src 'self'`,
+    `object-src 'none'`,
+    `base-uri 'self'`,
+    `form-action 'self'`,
+    `frame-ancestors 'none'`,
+    `connect-src 'self' https://generativelanguage.googleapis.com`,
+  ].join('; ');
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', cspHeader);
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
+  response.headers.set('Content-Security-Policy', cspHeader);
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+  return response;
+}
+
+export const config = {
+  matcher: [
+    {
+      source: '/((?!_next/static|_next/image|favicon.ico).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+  ],
+};
 ```
 
 ---
@@ -18145,29 +18199,87 @@ export type CompareRequest = z.infer<typeof CompareRequestSchema>;
 export type SampleRequest = z.infer<typeof SampleRequestSchema>;
 export type AnalyzeRequest = z.infer<typeof AnalyzeRequestSchema>;
 
-/**
- * Enforces byte-level request body size limits from Content-Length header.
- */
-export function enforceRequestBodySizeLimit(req: NextRequest): void {
-  const contentLength = req.headers.get('content-length');
-  if (contentLength && parseInt(contentLength, 10) > MAX_REQUEST_BODY_BYTES) {
-    throw new Error(
-      `Request payload exceeds maximum allowed limit of ${MAX_REQUEST_BODY_BYTES / (1024 * 1024)} MB (exceeds maximum allowed size).`
-    );
+function bodyTooLargeError(): Error {
+  return new Error(
+    `Request payload exceeds maximum allowed limit of ${
+      MAX_REQUEST_BODY_BYTES / (1024 * 1024)
+    } MB (exceeds maximum allowed size).`
+  );
+}
+
+function parseContentLength(req: Request): number | null {
+  const raw = req.headers.get('content-length');
+  if (!raw) return null;
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error('Invalid Content-Length header.');
   }
+  return parsed;
+}
+
+export function enforceRequestBodySizeLimit(req: Request): void {
+  const contentLength = parseContentLength(req);
+  if (contentLength !== null && contentLength > MAX_REQUEST_BODY_BYTES) {
+    throw bodyTooLargeError();
+  }
+}
+
+export function createBoundedBodyRequest(req: NextRequest | Request): Request {
+  enforceRequestBodySizeLimit(req);
+  if (!req.body) {
+    return new Request(req.url, {
+      method: req.method,
+      headers: req.headers,
+      signal: req.signal,
+    });
+  }
+  const reader = req.body.getReader();
+  let totalBytes = 0;
+  const boundedBody = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (done) {
+          controller.close();
+          return;
+        }
+        const chunk = value ?? new Uint8Array(0);
+        totalBytes += chunk.byteLength;
+        if (totalBytes > MAX_REQUEST_BODY_BYTES) {
+          await reader.cancel('request body exceeds maximum size');
+          controller.error(bodyTooLargeError());
+          return;
+        }
+        controller.enqueue(chunk);
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+    async cancel(reason) {
+      await reader.cancel(reason);
+    },
+  });
+  const init: RequestInit & { duplex: 'half' } = {
+    method: req.method,
+    headers: req.headers,
+    body: boundedBody,
+    duplex: 'half',
+  };
+  return new Request(req.url, init);
 }
 
 /**
  * Enforces byte-level body size limits before parsing JSON and applies strict schema validation.
  */
-export async function parseBoundedJson<T>(req: NextRequest, schema: z.ZodType<T>): Promise<T> {
-  enforceRequestBodySizeLimit(req);
+export async function parseBoundedJson<T>(
+  req: NextRequest | Request,
+  schema: z.ZodType<T>
+): Promise<T> {
+  const boundedReq = createBoundedBodyRequest(req);
 
-  const text = await req.text();
+  const text = await boundedReq.text();
   if (Buffer.byteLength(text, 'utf8') > MAX_REQUEST_BODY_BYTES) {
-    throw new Error(
-      `Request payload exceeds maximum allowed limit of ${MAX_REQUEST_BODY_BYTES / (1024 * 1024)} MB (exceeds maximum allowed size).`
-    );
+    throw bodyTooLargeError();
   }
 
   let json: unknown;
@@ -18787,8 +18899,10 @@ test.describe('LexiGuard End-to-End Required Flow Inventory (Flows 75-97)', () =
     await expect(printBtn).toBeVisible({ timeout: 15000 });
   });
 
-  // Flow 98: Critical UI controls are actually clickable (Step 8 regression test)
-  test('flow 98: critical UI controls are actually clickable', async ({ page }) => {
+  // Flow 98: Critical UI controls are actually clickable (14-step critical journey)
+  test('flow 98: critical UI controls are actually clickable and execute full workflow', async ({
+    page,
+  }) => {
     const browserErrors: string[] = [];
 
     page.on('pageerror', (error) => {
@@ -18797,31 +18911,75 @@ test.describe('LexiGuard End-to-End Required Flow Inventory (Flows 75-97)', () =
 
     await page.goto('/');
 
-    const documentsTab = page.getByRole('tab', { name: 'Documents' });
-    await expect(documentsTab).toBeVisible();
-    await expect(documentsTab).toBeEnabled();
-
-    const privacyTab = page.getByRole('tab', {
-      name: 'Privacy & Limits',
-    });
-
-    await privacyTab.click();
-    await expect(page.getByRole('tabpanel', { name: /Privacy/i })).toBeVisible();
-
-    await documentsTab.click();
-
-    const residentialButton = page.getByRole('button', {
-      name: /Residential Lease/i,
-    });
-
+    // 1. Click Residential Lease
+    const residentialButton = page.getByRole('button', { name: /Residential Lease/i });
     await expect(residentialButton).toBeVisible();
-    await expect(residentialButton).toBeEnabled();
-
     await residentialButton.click();
 
-    await expect(page.getByRole('heading', { name: /Residential Lease/i })).toBeVisible({
-      timeout: 15000,
-    });
+    // 2. Verify analysis completes and Overview renders
+    const leaseHeading = page.getByRole('heading', { name: /Residential Lease/i });
+    await expect(leaseHeading).toBeVisible({ timeout: 15000 });
+
+    // 3. Click Risks & Obligations
+    const risksTab = page.getByRole('tab', { name: 'Risks & Obligations' });
+    await risksTab.click();
+    await expect(page.locator('#panel-risks')).toBeVisible();
+
+    // 4. Click Inspect Evidence
+    const inspectEvidenceBtn = page
+      .getByRole('button', { name: /Inspect Evidence|View verified source excerpt/i })
+      .first();
+    await expect(inspectEvidenceBtn).toBeVisible();
+    await inspectEvidenceBtn.click();
+
+    // 5. Verify modal appears
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 5000 });
+
+    // 6. Press Escape
+    await page.keyboard.press('Escape');
+
+    // 7. Verify modal closes
+    await expect(dialog).toBeHidden({ timeout: 5000 });
+
+    // 8. Click Ask
+    const askTab = page.getByRole('tab', { name: 'Ask' });
+    await askTab.click();
+    await expect(page.locator('#panel-ask')).toBeVisible();
+
+    // 9. Submit a grounded legal question
+    const questionInput = page.locator('#user-legal-question');
+    await questionInput.fill('What is the penalty for late rent?');
+    const submitBtn = page.getByRole('button', { name: /Submit question/i });
+    await submitBtn.click();
+
+    // 10. Verify answer
+    await expect(page.getByText('DOCUMENT FACT', { exact: true })).toBeVisible({ timeout: 15000 });
+
+    // 11. Click Compare
+    const compareTab = page.getByRole('tab', { name: 'Compare' });
+    await compareTab.click();
+    await expect(page.locator('#panel-compare')).toBeVisible();
+
+    // 12. Run NDA comparison
+    const runCompareBtn = page.getByRole('button', { name: /Run Side-by-Side Comparison/i });
+    if (await runCompareBtn.isVisible()) {
+      await runCompareBtn.click();
+      await expect(page.getByText(/Side-by-Side Semantic Diff/i)).toBeVisible({ timeout: 15000 });
+    }
+
+    // 13. Click Privacy
+    const privacyTab = page.getByRole('tab', { name: 'Privacy & Limits' });
+    await privacyTab.click();
+    await expect(page.locator('#panel-privacy')).toBeVisible();
+
+    // 14. Clear session memory
+    const clearSessionBtn = page.getByRole('button', { name: /Clear Session Memory/i });
+    await clearSessionBtn.click();
+    await expect(page.getByRole('tab', { name: 'Documents' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
 
     expect(browserErrors).toEqual([]);
   });
@@ -19194,6 +19352,144 @@ describe('In-Memory Token Bucket Rate Limiter', () => {
     const victimStillBlocked = limiter.checkLimit(victim);
     expect(victimStillBlocked.isAllowed).toBe(false);
     expect(victimStillBlocked.capacityLimited).toBe(false);
+  });
+});
+```
+
+---
+
+### test/security/request-body-stream.test.ts
+
+<a id="test-security-request-body-stream-test-ts"></a>
+
+```typescript
+﻿import { describe, it, expect } from 'vitest';
+import { NextRequest } from 'next/server';
+import { createBoundedBodyRequest, enforceRequestBodySizeLimit } from '@/security/request-schemas';
+import { MAX_REQUEST_BODY_BYTES } from '@/security/quotas';
+
+describe('Streaming Request-Body Bounding (Security Fix #1)', () => {
+  it('1. rejects oversized declared Content-Length immediately', () => {
+    const req = new NextRequest('http://localhost/api/ingest', {
+      method: 'POST',
+      headers: {
+        'content-type': 'multipart/form-data; boundary=x',
+        'content-length': String(MAX_REQUEST_BODY_BYTES + 1),
+      },
+    });
+
+    expect(() => enforceRequestBodySizeLimit(req)).toThrow(/exceeds maximum allowed size/i);
+  });
+
+  it('2. rejects an unknown-length body once the streaming cap is exceeded', async () => {
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(5 * 1024 * 1024));
+        controller.enqueue(new Uint8Array(1024 * 1024 + 1));
+        controller.close();
+      },
+    });
+
+    const inner = new Request('http://localhost/api/ingest', {
+      method: 'POST',
+      headers: { 'content-type': 'multipart/form-data; boundary=x' },
+      body,
+      duplex: 'half',
+    } as RequestInit & { duplex: 'half' });
+    const req = new NextRequest(inner);
+
+    const bounded = createBoundedBodyRequest(req);
+    await expect(bounded.arrayBuffer()).rejects.toThrow(/exceeds maximum allowed size/i);
+  });
+
+  it('3. rejects under-reported Content-Length when actual stream exceeds cap', async () => {
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        // Lies about size in header (e.g. claims 100 bytes), but streams 7 MB
+        controller.enqueue(new Uint8Array(4 * 1024 * 1024));
+        controller.enqueue(new Uint8Array(3 * 1024 * 1024));
+        controller.close();
+      },
+    });
+
+    const inner = new Request('http://localhost/api/ingest', {
+      method: 'POST',
+      headers: {
+        'content-type': 'multipart/form-data; boundary=x',
+        'content-length': '100', // Spoofed smaller content-length
+      },
+      body,
+      duplex: 'half',
+    } as RequestInit & { duplex: 'half' });
+    const req = new NextRequest(inner);
+
+    const bounded = createBoundedBodyRequest(req);
+    await expect(bounded.arrayBuffer()).rejects.toThrow(/exceeds maximum allowed size/i);
+  });
+
+  it('4. rejects invalid/malformed non-numeric Content-Length safely', () => {
+    const req = new NextRequest('http://localhost/api/ingest', {
+      method: 'POST',
+      headers: {
+        'content-type': 'multipart/form-data; boundary=x',
+        'content-length': 'not-a-number',
+      },
+    });
+
+    expect(() => enforceRequestBodySizeLimit(req)).toThrow(/Invalid Content-Length header/i);
+  });
+
+  it('5. cancels underlying reader immediately upon quota breach', async () => {
+    let cancelCalled = false;
+    let cancelReason: unknown = null;
+
+    const sourceStream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(MAX_REQUEST_BODY_BYTES + 1024));
+      },
+      cancel(reason) {
+        cancelCalled = true;
+        cancelReason = reason;
+      },
+    });
+
+    const inner = new Request('http://localhost/api/ingest', {
+      method: 'POST',
+      headers: { 'content-type': 'application/octet-stream' },
+      body: sourceStream,
+      duplex: 'half',
+    } as RequestInit & { duplex: 'half' });
+    const req = new NextRequest(inner);
+
+    const bounded = createBoundedBodyRequest(req);
+    await expect(bounded.arrayBuffer()).rejects.toThrow(/exceeds maximum allowed size/i);
+    expect(cancelCalled).toBe(true);
+    expect(String(cancelReason)).toContain('request body exceeds maximum size');
+  });
+
+  it('6. leaves valid body under quota fully functional', async () => {
+    const payload = new Uint8Array([1, 2, 3, 4, 5]);
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(payload);
+        controller.close();
+      },
+    });
+
+    const inner = new Request('http://localhost/api/ingest', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/octet-stream',
+        'content-length': '5',
+      },
+      body,
+      duplex: 'half',
+    } as RequestInit & { duplex: 'half' });
+    const req = new NextRequest(inner);
+
+    const bounded = createBoundedBodyRequest(req);
+    const buf = await bounded.arrayBuffer();
+    expect(new Uint8Array(buf)).toEqual(payload);
   });
 });
 ```
@@ -19665,6 +19961,186 @@ describe('File Validation Security Controls', () => {
 
 ---
 
+### test/unit/gemini-provider-timeout.test.ts
+
+<a id="test-unit-gemini-provider-timeout-test-ts"></a>
+
+```typescript
+﻿import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { z } from 'zod';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GeminiLLMProvider } from '@/infrastructure/llm/gemini-provider';
+import { SECURITY_QUOTAS } from '@/security/quotas';
+
+type GenerativeModelMock = ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
+
+describe('Gemini Provider Timeout & Timer Cleanup (Security Fix #2)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  it('1. successful structured generation leaves zero pending timers', async () => {
+    const mockModel = {
+      generateContent: vi.fn().mockResolvedValue({
+        response: {
+          text: () => JSON.stringify({ message: 'hello world' }),
+        },
+      }),
+    };
+
+    vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue(
+      mockModel as unknown as GenerativeModelMock
+    );
+
+    const provider = new GeminiLLMProvider('test-api-key');
+    const resultPromise = provider.generateStructured({
+      systemPrompt: 'System',
+      userPrompt: 'User',
+      schema: z.object({ message: z.string() }),
+    });
+
+    const result = await resultPromise;
+    expect(result).toEqual({ message: 'hello world' });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('2. structured timeout cleans its timer and throws GeminiProviderError', async () => {
+    const mockModel = {
+      generateContent: vi.fn().mockImplementation(() => new Promise(() => {})), // Never resolves
+    };
+
+    vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue(
+      mockModel as unknown as GenerativeModelMock
+    );
+
+    const provider = new GeminiLLMProvider('test-api-key');
+    const resultPromise = provider.generateStructured({
+      systemPrompt: 'System',
+      userPrompt: 'User',
+      schema: z.object({ value: z.number() }),
+      maxRetries: 0,
+    });
+
+    // Advance time past operation timeout
+    vi.advanceTimersByTime(SECURITY_QUOTAS.OPERATION_TIMEOUT_MS + 100);
+
+    await expect(resultPromise).rejects.toThrow(/timed out/i);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('3. structured retry cleans the previous attempt timer', async () => {
+    let callCount = 0;
+    const mockModel = {
+      generateContent: vi.fn().mockImplementation(async () => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            response: {
+              text: () => 'INVALID JSON SYNTAX',
+            },
+          };
+        }
+        return {
+          response: {
+            text: () => JSON.stringify({ status: 'ok' }),
+          },
+        };
+      }),
+    };
+
+    vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue(
+      mockModel as unknown as GenerativeModelMock
+    );
+
+    const provider = new GeminiLLMProvider('test-api-key');
+    const resultPromise = provider.generateStructured({
+      systemPrompt: 'System',
+      userPrompt: 'User',
+      schema: z.object({ status: z.string() }),
+      maxRetries: 1,
+    });
+
+    const result = await resultPromise;
+    expect(result).toEqual({ status: 'ok' });
+    expect(callCount).toBe(2);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('4. final structured failure leaves zero pending timers', async () => {
+    const mockModel = {
+      generateContent: vi.fn().mockRejectedValue(new Error('Network disconnected')),
+    };
+
+    vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue(
+      mockModel as unknown as GenerativeModelMock
+    );
+
+    const provider = new GeminiLLMProvider('test-api-key');
+    const resultPromise = provider.generateStructured({
+      systemPrompt: 'System',
+      userPrompt: 'User',
+      schema: z.object({ test: z.boolean() }),
+      maxRetries: 1,
+    });
+
+    await expect(resultPromise).rejects.toThrow(/Network disconnected/i);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('5. successful text generation leaves zero pending timers', async () => {
+    const mockModel = {
+      generateContent: vi.fn().mockResolvedValue({
+        response: {
+          text: () => 'Plain text answer from LLM',
+        },
+      }),
+    };
+
+    vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue(
+      mockModel as unknown as GenerativeModelMock
+    );
+
+    const provider = new GeminiLLMProvider('test-api-key');
+    const resultPromise = provider.generateText({
+      systemPrompt: 'System',
+      userPrompt: 'User',
+    });
+
+    const text = await resultPromise;
+    expect(text).toBe('Plain text answer from LLM');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('6. text timeout cleans its timer and throws GeminiProviderError', async () => {
+    const mockModel = {
+      generateContent: vi.fn().mockImplementation(() => new Promise(() => {})), // Hangs
+    };
+
+    vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue(
+      mockModel as unknown as GenerativeModelMock
+    );
+
+    const provider = new GeminiLLMProvider('test-api-key');
+    const resultPromise = provider.generateText({
+      systemPrompt: 'System',
+      userPrompt: 'User',
+    });
+
+    vi.advanceTimersByTime(SECURITY_QUOTAS.OPERATION_TIMEOUT_MS + 100);
+
+    await expect(resultPromise).rejects.toThrow(/timed out/i);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+});
+```
+
+---
+
 ### test/unit/request-schemas.test.ts
 
 <a id="test-unit-request-schemas-test-ts"></a>
@@ -19772,6 +20248,334 @@ describe('Request Schemas & Identity Validation', () => {
     });
 
     expect(() => enforceRequestBodySizeLimit(req)).toThrow(/exceeds maximum allowed limit/);
+  });
+});
+```
+
+---
+
+### test/unit/retriever-efficiency.test.ts
+
+<a id="test-unit-retriever-efficiency-test-ts"></a>
+
+```typescript
+﻿import { describe, it, expect } from 'vitest';
+import { performance } from 'node:perf_hooks';
+import { ClauseRetriever } from '@/infrastructure/retrieval/bm25-retriever';
+import { Clause, Document } from '@/domain/documents/types';
+import { SECURITY_QUOTAS } from '@/security/quotas';
+
+// Test-local reference implementation representing previous unoptimized search behavior
+class ReferenceClauseRetriever {
+  private readonly indexedClauses: Clause[];
+  private readonly clauseTokens = new Map<string, string[]>();
+  private readonly docFreqs = new Map<string, number>();
+  private avgClauseLength = 1;
+
+  constructor(document: Document) {
+    this.indexedClauses = document.clauses.slice(0, SECURITY_QUOTAS.MAX_INDEXED_CHUNKS);
+    this.buildIndex();
+  }
+
+  private buildIndex(): void {
+    const STOP_WORDS = new Set([
+      'a',
+      'an',
+      'the',
+      'and',
+      'or',
+      'but',
+      'if',
+      'then',
+      'else',
+      'when',
+      'at',
+      'by',
+      'from',
+      'for',
+      'in',
+      'out',
+      'on',
+      'off',
+      'over',
+      'under',
+      'to',
+      'of',
+      'up',
+      'down',
+      'with',
+      'as',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+    ]);
+
+    let totalLength = 0;
+    const totalClauses = this.indexedClauses.length;
+
+    for (const clause of this.indexedClauses) {
+      const fullText = `${clause.title || ''} ${clause.text}`;
+      const tokens = fullText
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter((t) => t.length > 1 && !STOP_WORDS.has(t));
+      this.clauseTokens.set(clause.id, tokens);
+      totalLength += tokens.length;
+
+      for (const term of new Set(tokens)) {
+        this.docFreqs.set(term, (this.docFreqs.get(term) || 0) + 1);
+      }
+    }
+
+    this.avgClauseLength = totalClauses > 0 ? totalLength / totalClauses : 1;
+  }
+
+  public search(query: string, topK: number = SECURITY_QUOTAS.MAX_RETRIEVAL_TOP_K) {
+    const safeTopK = Math.min(Math.max(0, Math.floor(topK)), SECURITY_QUOTAS.MAX_RETRIEVAL_TOP_K);
+
+    const STOP_WORDS = new Set([
+      'a',
+      'an',
+      'the',
+      'and',
+      'or',
+      'but',
+      'if',
+      'then',
+      'else',
+      'when',
+      'at',
+      'by',
+      'from',
+      'for',
+      'in',
+      'out',
+      'on',
+      'off',
+      'over',
+      'under',
+      'to',
+      'of',
+      'up',
+      'down',
+      'with',
+      'as',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+    ]);
+
+    const queryTokens = query
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((t) => t.length > 1 && !STOP_WORDS.has(t));
+
+    if (queryTokens.length === 0 || this.indexedClauses.length === 0) return [];
+
+    const k1 = 1.5;
+    const b = 0.75;
+    const N = this.indexedClauses.length;
+    const results: Array<{ clause: Clause; score: number; matchedTerms: string[] }> = [];
+
+    // The unoptimized pattern: allocates and populates a new Map for every clause on every search
+    for (const clause of this.indexedClauses) {
+      const tokens = this.clauseTokens.get(clause.id) || [];
+      const clauseLength = tokens.length;
+      const termCounts = new Map<string, number>();
+
+      for (const token of tokens) {
+        termCounts.set(token, (termCounts.get(token) || 0) + 1);
+      }
+
+      let score = 0;
+      const matchedTerms: string[] = [];
+
+      for (const qTerm of queryTokens) {
+        const tf = termCounts.get(qTerm) || 0;
+        if (tf <= 0) continue;
+
+        matchedTerms.push(qTerm);
+        const df = this.docFreqs.get(qTerm) || 1;
+        const idf = Math.log(1 + (N - df + 0.5) / (df + 0.5));
+        const numerator = tf * (k1 + 1);
+        const denominator = tf + k1 * (1 - b + (b * clauseLength) / this.avgClauseLength);
+        score += idf * (numerator / denominator);
+      }
+
+      if (clause.clauseNumber && query.includes(clause.clauseNumber)) {
+        score += 5;
+        matchedTerms.push(clause.clauseNumber);
+      }
+
+      if (score > 0) {
+        results.push({ clause, score, matchedTerms });
+      }
+    }
+
+    results.sort((a, b) => b.score - a.score);
+    return results.slice(0, safeTopK);
+  }
+}
+
+function makeBenchmarkDocument(clauseCount: number): Document {
+  const clauses: Clause[] = [];
+  const vocabulary = [
+    'rent',
+    'renewal',
+    'notice',
+    'landlord',
+    'tenant',
+    'premises',
+    'payment',
+    'fee',
+    'inspection',
+    'maintenance',
+    'repair',
+    'liability',
+    'indemnity',
+    'dispute',
+    'arbitration',
+    'governing',
+    'law',
+    'confidential',
+    'information',
+    'termination',
+    'intellectual',
+    'property',
+  ];
+
+  for (let i = 1; i <= clauseCount; i++) {
+    const word1 = vocabulary[i % vocabulary.length];
+    const word2 = vocabulary[(i * 3) % vocabulary.length];
+    const word3 = vocabulary[(i * 7) % vocabulary.length];
+    const text = `Clause text for section ${i}. The ${word1} party shall adhere to ${word2} requirements and ensure ${word3} compliance.`;
+
+    clauses.push({
+      id: `clause-${i}`,
+      clauseNumber: `${i}.0`,
+      title: `Section ${i}: ${word1} and ${word2}`,
+      text,
+      pageNumber: Math.floor(i / 10) + 1,
+      sectionId: `sec-${Math.floor(i / 10) + 1}`,
+      span: {
+        start: (i - 1) * 100,
+        end: i * 100,
+        text,
+      },
+    });
+  }
+
+  return {
+    id: 'benchmark-doc-4000',
+    versionId: 'v1',
+    metadata: {
+      fileName: 'benchmark-doc.txt',
+      fileSizeBytes: clauseCount * 100,
+      mimeType: 'text/plain',
+      pageCount: Math.ceil(clauseCount / 10),
+      characterCount: clauseCount * 100,
+      sha256Hash: 'hash-benchmark',
+      ingestedAt: new Date().toISOString(),
+      isScannedOrLowText: false,
+    },
+    rawText: clauses.map((c) => c.text).join('\n'),
+    sections: [],
+    clauses,
+  };
+}
+
+function percentile(arr: number[], p: number): number {
+  const sorted = [...arr].sort((a, b) => a - b);
+  const idx = Math.floor((p / 100) * (sorted.length - 1));
+  return sorted[idx];
+}
+
+describe('BM25 ClauseRetriever Efficiency & Correctness Benchmark', () => {
+  const clauseCount = 2000;
+  const doc = makeBenchmarkDocument(clauseCount);
+
+  it('preserves exact ranking, clause IDs, matched terms, and scores within tolerance', () => {
+    const optRetriever = new ClauseRetriever(doc);
+    const refRetriever = new ReferenceClauseRetriever(doc);
+
+    const testQueries = [
+      'rent renewal notice',
+      'confidential information disclosure',
+      'arbitration liability dispute',
+    ];
+
+    for (const query of testQueries) {
+      const optResults = optRetriever.search(query, 8);
+      const refResults = refRetriever.search(query, 8);
+
+      expect(optResults.length).toBeGreaterThan(0);
+      expect(optResults.length).toBe(refResults.length);
+      expect(optResults.map((r) => r.clause.id)).toEqual(refResults.map((r) => r.clause.id));
+      expect(optResults.map((r) => r.matchedTerms)).toEqual(refResults.map((r) => r.matchedTerms));
+
+      for (let i = 0; i < optResults.length; i++) {
+        expect(Math.abs(optResults[i].score - refResults[i].score)).toBeLessThan(1e-5);
+      }
+    }
+  });
+
+  it('demonstrates measurable per-query latency reduction over reference implementation', () => {
+    const optRetriever = new ClauseRetriever(doc);
+    const refRetriever = new ReferenceClauseRetriever(doc);
+
+    const query = 'rent renewal notice';
+    const iterations = 100;
+
+    // Warm up both retrievers
+    optRetriever.search(query, 8);
+    refRetriever.search(query, 8);
+
+    // Benchmark Reference (Old) Implementation
+    const refTimes: number[] = [];
+    for (let i = 0; i < iterations; i++) {
+      const t0 = performance.now();
+      refRetriever.search(query, 8);
+      refTimes.push(performance.now() - t0);
+    }
+
+    // Benchmark Optimized Implementation
+    const optTimes: number[] = [];
+    for (let i = 0; i < iterations; i++) {
+      const t0 = performance.now();
+      optRetriever.search(query, 8);
+      optTimes.push(performance.now() - t0);
+    }
+
+    const refMedian = percentile(refTimes, 50);
+    const refP95 = percentile(refTimes, 95);
+    const optMedian = percentile(optTimes, 50);
+    const optP95 = percentile(optTimes, 95);
+
+    // Verify speedup invariants without console warnings
+    expect(optMedian).toBeLessThanOrEqual(refMedian * 0.85);
+    expect(optP95).toBeLessThanOrEqual(refP95 * 0.9);
   });
 });
 ```

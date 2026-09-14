@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -8,6 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  headers().get('x-nonce');
+
   return (
     <html lang="en" className="h-full">
       <body className="h-full flex flex-col antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-950">

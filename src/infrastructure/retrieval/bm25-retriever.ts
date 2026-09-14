@@ -7,60 +7,61 @@ export interface RetrievedClauseResult {
   matchedTerms: string[];
 }
 
-function tokenize(text: string): string[] {
-  const stopWords = new Set([
-    'a',
-    'an',
-    'the',
-    'and',
-    'or',
-    'but',
-    'if',
-    'then',
-    'else',
-    'when',
-    'at',
-    'by',
-    'from',
-    'for',
-    'in',
-    'out',
-    'on',
-    'off',
-    'over',
-    'under',
-    'to',
-    'of',
-    'up',
-    'down',
-    'with',
-    'as',
-    'is',
-    'are',
-    'was',
-    'were',
-    'be',
-    'been',
-    'being',
-    'have',
-    'has',
-    'had',
-    'do',
-    'does',
-    'did',
-  ]);
+const STOP_WORDS = new Set([
+  'a',
+  'an',
+  'the',
+  'and',
+  'or',
+  'but',
+  'if',
+  'then',
+  'else',
+  'when',
+  'at',
+  'by',
+  'from',
+  'for',
+  'in',
+  'out',
+  'on',
+  'off',
+  'over',
+  'under',
+  'to',
+  'of',
+  'up',
+  'down',
+  'with',
+  'as',
+  'is',
+  'are',
+  'was',
+  'were',
+  'be',
+  'been',
+  'being',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+]);
 
+function tokenize(text: string): string[] {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter((token) => token.length > 1 && !stopWords.has(token));
+    .filter((token) => token.length > 1 && !STOP_WORDS.has(token));
 }
 
 export class ClauseRetriever {
   public readonly document: Document;
   private readonly indexedClauses: Clause[];
   private readonly clauseTokens = new Map<string, string[]>();
+  private readonly termFrequencies = new Map<string, Map<string, number>>();
   private readonly docFreqs = new Map<string, number>();
   private avgClauseLength = 1;
 
@@ -80,7 +81,13 @@ export class ClauseRetriever {
       this.clauseTokens.set(clause.id, tokens);
       totalLength += tokens.length;
 
-      for (const term of new Set(tokens)) {
+      const frequencies = new Map<string, number>();
+      for (const term of tokens) {
+        frequencies.set(term, (frequencies.get(term) || 0) + 1);
+      }
+      this.termFrequencies.set(clause.id, frequencies);
+
+      for (const term of frequencies.keys()) {
         this.docFreqs.set(term, (this.docFreqs.get(term) || 0) + 1);
       }
     }
@@ -105,13 +112,8 @@ export class ClauseRetriever {
     const results: RetrievedClauseResult[] = [];
 
     for (const clause of this.indexedClauses) {
-      const tokens = this.clauseTokens.get(clause.id) || [];
-      const clauseLength = tokens.length;
-      const termCounts = new Map<string, number>();
-
-      for (const token of tokens) {
-        termCounts.set(token, (termCounts.get(token) || 0) + 1);
-      }
+      const termCounts = this.termFrequencies.get(clause.id) || new Map<string, number>();
+      const clauseLength = (this.clauseTokens.get(clause.id) || []).length;
 
       let score = 0;
       const matchedTerms: string[] = [];

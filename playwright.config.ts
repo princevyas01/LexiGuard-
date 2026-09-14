@@ -18,6 +18,7 @@ export default defineConfig({
     timeout: 120000,
     env: {
       RATE_LIMIT_PER_MINUTE: '500',
+      LLM_PROVIDER: 'mock',
     },
   },
   projects: [

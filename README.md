@@ -209,7 +209,7 @@ npm run dev
 | **Code Quality** | Strict TypeScript (`noImplicitAny`, zero `any`), ESLint 0 warnings, layered architecture (`src/domain/`, `src/application/`, `src/infrastructure/`). | **Verified Pass** |
 | **Security** | Magic-byte file validation, ZIP-bomb protection, XML prompt injection containment, CSP headers, zero secrets in git. | **Verified Pass** |
 | **Efficiency** | Lightweight pure TS parsing, BM25 retrieval, sub-second responses, bounded memory and token quotas. | **Verified Pass** |
-| **Testing** | 73 Vitest tests + 23 Playwright flows across unit, integration, security, axe accessibility, and AI evaluation benchmarks. | **Verified Pass** |
+| **Testing** | 87 Vitest tests + 24 Playwright flows (111 tests total) across unit, integration, security, axe accessibility, and AI evaluation benchmarks. | **Verified Pass** |
 | **Accessibility** | WCAG 2.2 AA technical baseline, automated `axe-core` 0 violations, keyboard focus trap/restoration, non-color-only risk tags. | **Verified Pass** |
 | **Product Utility** | 5 core legal workflows, two-column plain language explanations, obligations table, and lawyer consultation sheet. | **Verified Pass** |
 | **AI Reliability** | 6-layer hallucination control, exact verbatim quote verifier, deterministic refusal on unmentioned topics, strict boundary disclaimers. | **Verified Pass** |
