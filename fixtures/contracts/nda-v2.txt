@@ -1,0 +1,19 @@
+PROPRIETARY NON-DISCLOSURE AND RESTRICTIVE COVENANTS AGREEMENT (VERSION 2.0)
+
+This Agreement is entered into as of February 10, 2025, by and between Apex Innovations Inc. ("Apex") and Beta Dynamics LLC ("Recipient").
+
+1. CONFIDENTIAL INFORMATION
+1.1 Definition: "Confidential Information" means any and all proprietary data, trade secrets, software, customer lists, and financial records disclosed by Apex to Recipient. This Agreement does not impose confidentiality obligations upon Apex regarding Recipient's materials.
+
+2. OBLIGATIONS OF RECIPIENT
+2.1 Standard of Care: Recipient shall exercise the highest degree of care to maintain strict secrecy of Apex's Confidential Information.
+2.2 Restrictions: Recipient shall not disclose, duplicate, reverse engineer, or utilize Apex Confidential Information for any purpose other than Apex's sole commercial benefit.
+
+3. RESTRICTIVE COVENANT AND NON-COMPETE
+3.1 Non-Competition: Recipient agrees that for a period of two (2) years following execution, Recipient shall not directly or indirectly develop, market, or sell any product or service that competes with Apex's business lines in North America.
+
+4. INDEMNIFICATION AND REMEDIES
+4.1 Unilateral Indemnity: Recipient shall indemnify, defend, and hold harmless Apex from all liabilities, legal fees, and consequential damages arising from any alleged breach of this Agreement. Mutual indemnity is explicitly disclaimed.
+
+5. GOVERNING LAW AND VENUE
+5.1 Jurisdiction: This Agreement shall be governed by English law, with exclusive jurisdiction in the courts of London, England.

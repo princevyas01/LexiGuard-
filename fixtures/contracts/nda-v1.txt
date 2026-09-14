@@ -1,0 +1,20 @@
+MUTUAL NON-DISCLOSURE AGREEMENT (VERSION 1.0)
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into as of February 10, 2024, by and between Apex Innovations Inc. and Beta Dynamics LLC.
+
+1. CONFIDENTIAL INFORMATION
+1.1 Definition: "Confidential Information" means all non-public, proprietary information disclosed by either party ("Disclosing Party") to the other party ("Receiving Party"), whether orally or in writing, that is designated as confidential or reasonably understood to be confidential.
+
+2. OBLIGATIONS OF RECEIVING PARTY
+2.1 Standard of Care: Each party shall exercise reasonable care, and at least the same degree of care it uses to protect its own confidential information of like nature, to prevent unauthorized disclosure or use of the Disclosing Party's Confidential Information.
+2.2 Permitted Use: Confidential Information may only be used by the Receiving Party for the purpose of evaluating a potential commercial partnership ("Purpose").
+
+3. TERM AND SURVIVAL
+3.1 Term: This Agreement shall remain in effect for a period of two (2) years from the date hereof.
+3.2 Survival: The confidentiality obligations hereunder shall survive for three (3) years following termination or expiration.
+
+4. INDEMNIFICATION
+4.1 Mutual Indemnity: Each party agrees to defend and indemnify the other party against direct damages arising out of any willful breach of confidentiality under this Agreement.
+
+5. GOVERNING LAW
+5.1 Jurisdiction: This Agreement is governed by the laws of the State of California, with venue in San Francisco County.
