@@ -1,9 +1,9 @@
 import React from 'react';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
-import { Document } from '@/domain/documents/types';
-import { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
-import { ActionPlan } from '@/domain/action-plan/types';
-import { ActiveTab } from '../layout/Navbar';
+import type { Document } from '@/domain/documents/types';
+import type { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
+import type { ActionPlan } from '@/domain/action-plan/types';
+import type { ActiveTab } from '../layout/Navbar';
 
 interface DocumentOverviewProps {
   document: Document;

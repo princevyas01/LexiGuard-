@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { ExternalLink, Filter, Calendar, ShieldCheck } from 'lucide-react';
-import { AnalysisFinding, EvidenceSpan } from '@/domain/findings/types';
-import { DeadlineItem, Obligation } from '@/domain/obligations/types';
+import type { AnalysisFinding, EvidenceSpan } from '@/domain/findings/types';
+import type { DeadlineItem, Obligation } from '@/domain/obligations/types';
 import { AccessibleModal } from '../common/AccessibleModal';
 import { SeverityBadge } from '../common/SeverityBadge';
 

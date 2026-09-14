@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { GitCompare, RefreshCw, ArrowRight } from 'lucide-react';
-import { DocumentComparisonResult } from '@/domain/comparison/types';
+import type { DocumentComparisonResult } from '@/domain/comparison/types';
 import { SeverityBadge } from '../common/SeverityBadge';
 
 interface ContractComparisonViewProps {
