@@ -1,0 +1,60 @@
+/**
+ * Canonical centralized security quotas for LexiGuard.
+ * Every quota declared here must have runtime enforcement and a regression test.
+ */
+export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+export const MAX_EXTRACTED_CHARACTERS = 100_000;
+export const MAX_DECOMPRESSED_ARCHIVE_BYTES = 20 * 1024 * 1024;
+export const MAX_PDF_STREAM_BYTES = 20 * 1024 * 1024;
+export const MAX_QUESTION_LENGTH = 2_000;
+export const MAX_REQUEST_BODY_BYTES = 6 * 1024 * 1024;
+export const MAX_COMPARISON_DOCUMENT_CHARACTERS = 20_000;
+export const MAX_DOCUMENT_STORE_ENTRIES = 200;
+export const MAX_RETRIEVER_CACHE_ENTRIES = 200;
+export const MAX_RATE_LIMIT_IDENTIFIERS = 10_000;
+export const MAX_CONCURRENT_JOBS = 4;
+export const MAX_CONCURRENT_WAITERS = 32;
+export const MAX_INDEXED_CHUNKS = 4_000;
+export const MAX_DOCUMENT_PAGES = 50;
+export const MAX_RETRIEVAL_TOP_K = 8;
+export const MAX_OUTPUT_TOKENS = 2_048;
+export const OPERATION_TIMEOUT_MS = 15_000;
+export const RATE_LIMIT_PER_MINUTE = 30;
+export const MIN_TEXT_CHARACTERS_FOR_SCANNED_CHECK = 100;
+
+if (MAX_UPLOAD_BYTES > MAX_REQUEST_BODY_BYTES) {
+  throw new Error('Configuration error: MAX_UPLOAD_BYTES cannot exceed MAX_REQUEST_BODY_BYTES.');
+}
+if (MAX_COMPARISON_DOCUMENT_CHARACTERS > MAX_EXTRACTED_CHARACTERS) {
+  throw new Error(
+    'Configuration error: MAX_COMPARISON_DOCUMENT_CHARACTERS cannot exceed MAX_EXTRACTED_CHARACTERS.'
+  );
+}
+if (MAX_CONCURRENT_JOBS <= 0 || MAX_CONCURRENT_WAITERS < 0) {
+  throw new Error('Configuration error: concurrency quotas must be valid positive bounds.');
+}
+if (MAX_RETRIEVER_CACHE_ENTRIES <= 0 || MAX_DOCUMENT_STORE_ENTRIES <= 0) {
+  throw new Error('Configuration error: cache/store capacity must be positive.');
+}
+
+export const SECURITY_QUOTAS = {
+  MAX_FILE_SIZE_BYTES: MAX_UPLOAD_BYTES,
+  MAX_DECOMPRESSED_ARCHIVE_BYTES,
+  MAX_DOCUMENT_PAGES: 50,
+  MAX_EXTRACTED_CHARACTERS,
+  MAX_INDEXED_CHUNKS,
+  MAX_RETRIEVAL_TOP_K,
+  MAX_OUTPUT_TOKENS,
+  OPERATION_TIMEOUT_MS,
+  MAX_CONCURRENT_JOBS,
+  MAX_CONCURRENT_WAITERS,
+  RATE_LIMIT_PER_MINUTE,
+  MIN_TEXT_CHARACTERS_FOR_SCANNED_CHECK,
+  MAX_PDF_STREAM_BYTES,
+  MAX_QUESTION_LENGTH,
+  MAX_REQUEST_BODY_BYTES,
+  MAX_COMPARISON_DOCUMENT_CHARACTERS,
+  MAX_DOCUMENT_STORE_ENTRIES,
+  MAX_RETRIEVER_CACHE_ENTRIES,
+  MAX_RATE_LIMIT_IDENTIFIERS,
+} as const;
