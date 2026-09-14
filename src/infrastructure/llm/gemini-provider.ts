@@ -25,7 +25,7 @@ export class GeminiLLMProvider implements LLMProvider {
   private client: GoogleGenerativeAI;
   private modelName: string;
 
-  constructor(apiKey: string, modelName = 'gemini-2.5-flash') {
+  constructor(apiKey: string, modelName = 'gemini-1.5-flash') {
     if (!apiKey) {
       throw new GeminiProviderError('GEMINI_API_KEY is required for GeminiLLMProvider');
     }
@@ -51,13 +51,14 @@ export class GeminiLLMProvider implements LLMProvider {
 
     while (attempts <= maxRetries) {
       attempts++;
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
       try {
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(
             () => reject(new GeminiProviderError('Gemini request timed out.')),
             SECURITY_QUOTAS.OPERATION_TIMEOUT_MS
-          )
-        );
+          );
+        });
 
         const resultPromise = model.generateContent(fullPrompt);
         const response = await Promise.race([resultPromise, timeoutPromise]);
@@ -83,6 +84,10 @@ export class GeminiLLMProvider implements LLMProvider {
         }
       } catch (err) {
         lastError = err instanceof Error ? err : new GeminiProviderError(String(err));
+      } finally {
+        if (timeoutId !== undefined) {
+          clearTimeout(timeoutId);
+        }
       }
     }
 
@@ -101,13 +106,25 @@ export class GeminiLLMProvider implements LLMProvider {
     });
 
     const fullPrompt = `${request.systemPrompt}\n\n${request.userPrompt}`;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
-      const response = await model.generateContent(fullPrompt);
+      const resultPromise = model.generateContent(fullPrompt);
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(
+          () => reject(new GeminiProviderError('Gemini text request timed out.')),
+          SECURITY_QUOTAS.OPERATION_TIMEOUT_MS
+        );
+      });
+      const response = await Promise.race([resultPromise, timeoutPromise]);
       return response.response.text();
     } catch (err) {
       throw new GeminiProviderError(
         `Gemini text generation failed: ${err instanceof Error ? err.message : String(err)}`
       );
+    } finally {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
     }
   }
 }
