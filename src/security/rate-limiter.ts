@@ -1,4 +1,4 @@
-﻿import { MAX_RATE_LIMIT_IDENTIFIERS, RATE_LIMIT_PER_MINUTE } from './quotas';
+import { MAX_RATE_LIMIT_IDENTIFIERS, RATE_LIMIT_PER_MINUTE } from './quotas';
 
 export const ENTRY_TTL_MS = 15 * 60 * 1000;
 
@@ -124,8 +124,16 @@ const configuredTokens = process.env.RATE_LIMIT_PER_MINUTE
   ? Number.parseInt(process.env.RATE_LIMIT_PER_MINUTE, 10)
   : RATE_LIMIT_PER_MINUTE;
 
-export const globalRateLimiter = new InMemoryRateLimiter(
-  Number.isFinite(configuredTokens) && configuredTokens > 0
-    ? configuredTokens
-    : RATE_LIMIT_PER_MINUTE
-);
+const globalForRateLimiter = globalThis as unknown as {
+  globalRateLimiter?: InMemoryRateLimiter;
+};
+
+export const globalRateLimiter =
+  globalForRateLimiter.globalRateLimiter ??
+  new InMemoryRateLimiter(
+    Number.isFinite(configuredTokens) && configuredTokens > 0
+      ? configuredTokens
+      : RATE_LIMIT_PER_MINUTE
+  );
+
+globalForRateLimiter.globalRateLimiter = globalRateLimiter;

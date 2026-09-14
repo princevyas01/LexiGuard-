@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Document } from '@/domain/documents/types';
-import { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
-import { ActionPlan } from '@/domain/action-plan/types';
-import { DocumentComparisonResult } from '@/domain/comparison/types';
-import { Navbar, ActiveTab } from '@/components/layout/Navbar';
+import type { Document } from '@/domain/documents/types';
+import type { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
+import type { ActionPlan } from '@/domain/action-plan/types';
+import type { DocumentComparisonResult } from '@/domain/comparison/types';
+import { Navbar, type ActiveTab } from '@/components/layout/Navbar';
 import { LegalDisclaimerBanner } from '@/components/common/LegalDisclaimerBanner';
 import { DocumentUploader } from '@/components/documents/DocumentUploader';
 import { DocumentOverview } from '@/components/overview/DocumentOverview';

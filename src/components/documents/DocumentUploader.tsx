@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload, FileCheck, AlertCircle, Sparkles, ShieldAlert } from 'lucide-react';
-import { Document } from '@/domain/documents/types';
+import type { Document } from '@/domain/documents/types';
 
 interface DocumentUploaderProps {
   onDocumentLoaded: (doc: Document) => void;
