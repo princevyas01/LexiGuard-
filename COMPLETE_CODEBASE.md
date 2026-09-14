@@ -166,6 +166,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: master
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -174,7 +176,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
@@ -1240,7 +1242,8 @@ Authorized Legal Agent for Landlord
 <a id="next-config-js"></a>
 
 ```javascript
-/** @type {import('next').NextConfig} */
+const isDev = process.env.NODE_ENV !== 'production';
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -1252,7 +1255,7 @@ const nextConfig = {
           key: 'Content-Security-Policy',
           value: [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline'",
+            isDev ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self' 'unsafe-inline'",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' data: blob:",
             "font-src 'self'",
@@ -1616,9 +1619,9 @@ module.exports = nextConfig;
       }
     },
     "node_modules/@emnapi/wasi-threads": {
-      "version": "1.2.1",
-      "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz",
-      "integrity": "sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==",
+      "version": "1.2.3",
+      "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.3.tgz",
+      "integrity": "sha512-ELEBe8PsLvvJ6QMr0zLt8ffvOHW/dc1m3CEzNMg7aJUv3bMaoDtw2TXyDAwkYBuroxxuHEwhRTLJSe5sya547g==",
       "dev": true,
       "license": "MIT",
       "optional": true,
@@ -3563,6 +3566,40 @@ module.exports = nextConfig;
         "node": ">=14.0.0"
       }
     },
+    "node_modules/@unrs/resolver-binding-wasm32-wasi/node_modules/@emnapi/core": {
+      "version": "1.10.0",
+      "resolved": "https://registry.npmjs.org/@emnapi/core/-/core-1.10.0.tgz",
+      "integrity": "sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "@emnapi/wasi-threads": "1.2.1",
+        "tslib": "^2.4.0"
+      }
+    },
+    "node_modules/@unrs/resolver-binding-wasm32-wasi/node_modules/@emnapi/runtime": {
+      "version": "1.10.0",
+      "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.10.0.tgz",
+      "integrity": "sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "tslib": "^2.4.0"
+      }
+    },
+    "node_modules/@unrs/resolver-binding-wasm32-wasi/node_modules/@emnapi/wasi-threads": {
+      "version": "1.2.1",
+      "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz",
+      "integrity": "sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "tslib": "^2.4.0"
+      }
+    },
     "node_modules/@unrs/resolver-binding-win32-arm64-msvc": {
       "version": "1.12.2",
       "resolved": "https://registry.npmjs.org/@unrs/resolver-binding-win32-arm64-msvc/-/resolver-binding-win32-arm64-msvc-1.12.2.tgz",
@@ -5318,6 +5355,7 @@ module.exports = nextConfig;
       "integrity": "sha512-whOE1HFo/qJDyX4SnXzP4N6zOWn79WhnCUY/iDR0mPfQZO8wcYE4JClzI2oZrhBnnMUCBCHZhO6VQyoBU95mZA==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@rtsao/scc": "^1.1.0",
         "array-includes": "^3.1.9",
@@ -10956,7 +10994,7 @@ module.exports = nextConfig;
     "test:eval": "vitest run test/ai-eval",
     "test:all": "vitest run",
     "test:e2e": "playwright test",
-    "quality": "npm run typecheck && npm run lint && npm run format:check && npm run test:all && npm run test:e2e && npm run build",
+    "quality": "npm run typecheck && npm run lint && npm run format:check && npm run test:all && npm run build && npm run test:e2e",
     "verify": "npm run quality && node scripts/verify-submission.js"
   },
   "dependencies": {
@@ -11617,11 +11655,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 'use client';
 
 import React, { useState } from 'react';
-import { Document } from '@/domain/documents/types';
-import { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
-import { ActionPlan } from '@/domain/action-plan/types';
-import { DocumentComparisonResult } from '@/domain/comparison/types';
-import { Navbar, ActiveTab } from '@/components/layout/Navbar';
+import type { Document } from '@/domain/documents/types';
+import type { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
+import type { ActionPlan } from '@/domain/action-plan/types';
+import type { DocumentComparisonResult } from '@/domain/comparison/types';
+import { Navbar, type ActiveTab } from '@/components/layout/Navbar';
 import { LegalDisclaimerBanner } from '@/components/common/LegalDisclaimerBanner';
 import { DocumentUploader } from '@/components/documents/DocumentUploader';
 import { DocumentOverview } from '@/components/overview/DocumentOverview';
@@ -12657,7 +12695,7 @@ export async function answerDocumentQuestion(
 ```typescript
 import React, { useState } from 'react';
 import { CheckSquare, Printer, HelpCircle, FileText } from 'lucide-react';
-import { ActionPlan } from '@/domain/action-plan/types';
+import type { ActionPlan } from '@/domain/action-plan/types';
 
 interface ActionPlanViewProps {
   actionPlan: ActionPlan;
@@ -12844,9 +12882,9 @@ export const ActionPlanView: React.FC<ActionPlanViewProps> = ({ actionPlan }) =>
 ```typescript
 import React, { useState, useRef } from 'react';
 import { Send, MessageSquare, ShieldCheck, HelpCircle, ExternalLink } from 'lucide-react';
-import { Document } from '@/domain/documents/types';
-import { EvidenceSpan } from '@/domain/findings/types';
-import { AskResponse } from '@/application/qna/answer-document-question';
+import type { Document } from '@/domain/documents/types';
+import type { EvidenceSpan } from '@/domain/findings/types';
+import type { AskResponse } from '@/application/qna/answer-document-question';
 import { AccessibleModal } from '../common/AccessibleModal';
 
 interface GroundedQnAViewProps {
@@ -13235,7 +13273,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
 ```typescript
 import React from 'react';
 import { ShieldAlert, AlertTriangle } from 'lucide-react';
-import { EscalationTrigger } from '@/domain/action-plan/types';
+import type { EscalationTrigger } from '@/domain/action-plan/types';
 
 interface LegalDisclaimerBannerProps {
   escalationTriggers?: EscalationTrigger[];
@@ -13301,7 +13339,7 @@ export const LegalDisclaimerBanner: React.FC<LegalDisclaimerBannerProps> = ({
 ```typescript
 import React from 'react';
 import { AlertTriangle, AlertCircle, Info, CheckCircle2 } from 'lucide-react';
-import { RiskSeverity } from '@/domain/findings/types';
+import type { RiskSeverity } from '@/domain/findings/types';
 
 interface SeverityBadgeProps {
   severity: RiskSeverity;
@@ -13380,7 +13418,7 @@ export const SeverityBadge: React.FC<SeverityBadgeProps> = ({ severity, classNam
 ```typescript
 import React, { useState } from 'react';
 import { GitCompare, RefreshCw, ArrowRight } from 'lucide-react';
-import { DocumentComparisonResult } from '@/domain/comparison/types';
+import type { DocumentComparisonResult } from '@/domain/comparison/types';
 import { SeverityBadge } from '../common/SeverityBadge';
 
 interface ContractComparisonViewProps {
@@ -13580,7 +13618,7 @@ export const ContractComparisonView: React.FC<ContractComparisonViewProps> = ({
 ```typescript
 import React, { useState, useRef } from 'react';
 import { Upload, FileCheck, AlertCircle, Sparkles, ShieldAlert } from 'lucide-react';
-import { Document } from '@/domain/documents/types';
+import type { Document } from '@/domain/documents/types';
 
 interface DocumentUploaderProps {
   onDocumentLoaded: (doc: Document) => void;
@@ -13991,10 +14029,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, hasDocum
 ```typescript
 import React from 'react';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
-import { Document } from '@/domain/documents/types';
-import { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
-import { ActionPlan } from '@/domain/action-plan/types';
-import { ActiveTab } from '../layout/Navbar';
+import type { Document } from '@/domain/documents/types';
+import type { DocumentAnalysisResult } from '@/application/analysis/analyze-document';
+import type { ActionPlan } from '@/domain/action-plan/types';
+import type { ActiveTab } from '../layout/Navbar';
 
 interface DocumentOverviewProps {
   document: Document;
@@ -14273,8 +14311,8 @@ export const PrivacyView: React.FC<PrivacyViewProps> = ({ onClearSession }) => {
 ```typescript
 import React, { useState, useRef } from 'react';
 import { ExternalLink, Filter, Calendar, ShieldCheck } from 'lucide-react';
-import { AnalysisFinding, EvidenceSpan } from '@/domain/findings/types';
-import { DeadlineItem, Obligation } from '@/domain/obligations/types';
+import type { AnalysisFinding, EvidenceSpan } from '@/domain/findings/types';
+import type { DeadlineItem, Obligation } from '@/domain/obligations/types';
 import { AccessibleModal } from '../common/AccessibleModal';
 import { SeverityBadge } from '../common/SeverityBadge';
 
@@ -17293,7 +17331,13 @@ export class InMemoryDocumentStore {
   }
 }
 
-export const documentStore = new InMemoryDocumentStore();
+const globalForStore = globalThis as unknown as {
+  documentStore?: InMemoryDocumentStore;
+};
+
+export const documentStore = globalForStore.documentStore ?? new InMemoryDocumentStore();
+
+globalForStore.documentStore = documentStore;
 ```
 
 ---
@@ -17353,7 +17397,7 @@ export const documentStore = new InMemoryDocumentStore();
 <a id="src-security-concurrency-gate-ts"></a>
 
 ```typescript
-﻿import { MAX_CONCURRENT_JOBS, MAX_CONCURRENT_WAITERS } from './quotas';
+import { MAX_CONCURRENT_JOBS, MAX_CONCURRENT_WAITERS } from './quotas';
 
 export class ConcurrencyLimitError extends Error {
   constructor(message = 'Server is temporarily busy. Please retry shortly.') {
@@ -17435,7 +17479,14 @@ export class AsyncConcurrencyGate {
   }
 }
 
-export const globalConcurrencyGate = new AsyncConcurrencyGate();
+const globalForGate = globalThis as unknown as {
+  globalConcurrencyGate?: AsyncConcurrencyGate;
+};
+
+export const globalConcurrencyGate =
+  globalForGate.globalConcurrencyGate ?? new AsyncConcurrencyGate();
+
+globalForGate.globalConcurrencyGate = globalConcurrencyGate;
 ```
 
 ---
@@ -17865,7 +17916,7 @@ export const SECURITY_QUOTAS = {
 <a id="src-security-rate-limiter-ts"></a>
 
 ```typescript
-﻿import { MAX_RATE_LIMIT_IDENTIFIERS, RATE_LIMIT_PER_MINUTE } from './quotas';
+import { MAX_RATE_LIMIT_IDENTIFIERS, RATE_LIMIT_PER_MINUTE } from './quotas';
 
 export const ENTRY_TTL_MS = 15 * 60 * 1000;
 
@@ -17991,11 +18042,19 @@ const configuredTokens = process.env.RATE_LIMIT_PER_MINUTE
   ? Number.parseInt(process.env.RATE_LIMIT_PER_MINUTE, 10)
   : RATE_LIMIT_PER_MINUTE;
 
-export const globalRateLimiter = new InMemoryRateLimiter(
-  Number.isFinite(configuredTokens) && configuredTokens > 0
-    ? configuredTokens
-    : RATE_LIMIT_PER_MINUTE
-);
+const globalForRateLimiter = globalThis as unknown as {
+  globalRateLimiter?: InMemoryRateLimiter;
+};
+
+export const globalRateLimiter =
+  globalForRateLimiter.globalRateLimiter ??
+  new InMemoryRateLimiter(
+    Number.isFinite(configuredTokens) && configuredTokens > 0
+      ? configuredTokens
+      : RATE_LIMIT_PER_MINUTE
+  );
+
+globalForRateLimiter.globalRateLimiter = globalRateLimiter;
 ```
 
 ---
@@ -18726,6 +18785,45 @@ test.describe('LexiGuard End-to-End Required Flow Inventory (Flows 75-97)', () =
 
     const printBtn = page.getByRole('button', { name: /Print \/ Export Preparation Sheet/i });
     await expect(printBtn).toBeVisible({ timeout: 15000 });
+  });
+
+  // Flow 98: Critical UI controls are actually clickable (Step 8 regression test)
+  test('flow 98: critical UI controls are actually clickable', async ({ page }) => {
+    const browserErrors: string[] = [];
+
+    page.on('pageerror', (error) => {
+      browserErrors.push(error.message);
+    });
+
+    await page.goto('/');
+
+    const documentsTab = page.getByRole('tab', { name: 'Documents' });
+    await expect(documentsTab).toBeVisible();
+    await expect(documentsTab).toBeEnabled();
+
+    const privacyTab = page.getByRole('tab', {
+      name: 'Privacy & Limits',
+    });
+
+    await privacyTab.click();
+    await expect(page.getByRole('tabpanel', { name: /Privacy/i })).toBeVisible();
+
+    await documentsTab.click();
+
+    const residentialButton = page.getByRole('button', {
+      name: /Residential Lease/i,
+    });
+
+    await expect(residentialButton).toBeVisible();
+    await expect(residentialButton).toBeEnabled();
+
+    await residentialButton.click();
+
+    await expect(page.getByRole('heading', { name: /Residential Lease/i })).toBeVisible({
+      timeout: 15000,
+    });
+
+    expect(browserErrors).toEqual([]);
   });
 });
 ```
