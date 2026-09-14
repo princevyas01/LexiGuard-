@@ -25,7 +25,7 @@ export class GeminiLLMProvider implements LLMProvider {
   private client: GoogleGenerativeAI;
   private modelName: string;
 
-  constructor(apiKey: string, modelName = 'gemini-1.5-flash') {
+  constructor(apiKey: string, modelName = 'gemini-3.6-flash') {
     if (!apiKey) {
       throw new GeminiProviderError('GEMINI_API_KEY is required for GeminiLLMProvider');
     }
@@ -62,12 +62,16 @@ export class GeminiLLMProvider implements LLMProvider {
 
         const resultPromise = model.generateContent(fullPrompt);
         const response = await Promise.race([resultPromise, timeoutPromise]);
-        const text = response.response.text();
+        const rawText = response.response.text().trim();
+        const jsonText = rawText
+          .replace(/^```(?:json)?\s*/i, '')
+          .replace(/\s*```$/i, '')
+          .trim();
 
         // Parse and validate with Zod
         let parsedJson: unknown;
         try {
-          parsedJson = JSON.parse(text);
+          parsedJson = JSON.parse(jsonText);
         } catch (jsonErr) {
           lastError = new GeminiProviderError('Model did not return valid JSON syntax');
           continue; // Retry if JSON syntax was malformed

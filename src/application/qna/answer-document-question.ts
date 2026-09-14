@@ -102,7 +102,8 @@ export async function answerDocumentQuestion(
   const systemInstruction =
     'You are LexiGuard. Answer the user question using ONLY the provided clauses. ' +
     'If the answer cannot be found in those clauses, state: "Insufficient evidence in the provided document." ' +
-    'Always include exact quoted evidence and preserve the legal-information boundary.';
+    'Always include exact quoted evidence and preserve the legal-information boundary. ' +
+    'Response JSON must contain fields: question, answer (string), claimType ("DOCUMENT_FACT" | "DERIVED_INTERPRETATION" | "INSUFFICIENT_EVIDENCE"), confidence ("DIRECTLY_STATED" | "STRONGLY_IMPLIED" | "NOT_FOUND"), isEvidenceSufficient (boolean), supportingSpans (array of EvidenceSpan with clauseId, exactQuotedText, startOffset, endOffset), legalBoundaryDisclaimer (string), and suggestedQuestions (string[]).';
 
   const userGoal = `Answer: ${cleanQuestion} Document ID: ${document.id} Version: ${document.versionId}`;
 

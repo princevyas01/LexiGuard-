@@ -119,8 +119,9 @@ Total files documented: 101
 # Default mode is "mock" which requires ZERO credentials and operates 100% offline.
 LLM_PROVIDER=mock
 
-# Optional: Google Gemini API Key (only used when LLM_PROVIDER=gemini)
+# Optional: Google Gemini API Key & Model (only used when LLM_PROVIDER=gemini)
 GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.6-flash
 
 # Application Limits
 MAX_UPLOAD_BYTES=5242880
@@ -483,7 +484,7 @@ npm run dev
 | **Code Quality** | Strict TypeScript (`noImplicitAny`, zero `any`), ESLint 0 warnings, layered architecture (`src/domain/`, `src/application/`, `src/infrastructure/`). | **Verified Pass** |
 | **Security** | Magic-byte file validation, ZIP-bomb protection, XML prompt injection containment, CSP headers, zero secrets in git. | **Verified Pass** |
 | **Efficiency** | Lightweight pure TS parsing, BM25 retrieval, sub-second responses, bounded memory and token quotas. | **Verified Pass** |
-| **Testing** | 87 Vitest tests + 24 Playwright flows (111 tests total) across unit, integration, security, axe accessibility, and AI evaluation benchmarks. | **Verified Pass** |
+| **Testing** | 88 Vitest tests + 24 Playwright flows (112 tests total) across unit, integration, security, axe accessibility, and AI evaluation benchmarks. | **Verified Pass** |
 | **Accessibility** | WCAG 2.2 AA technical baseline, automated `axe-core` 0 violations, keyboard focus trap/restoration, non-color-only risk tags. | **Verified Pass** |
 | **Product Utility** | 5 core legal workflows, two-column plain language explanations, obligations table, and lawyer consultation sheet. | **Verified Pass** |
 | **AI Reliability** | 6-layer hallucination control, exact verbatim quote verifier, deterministic refusal on unmentioned topics, strict boundary disclaimers. | **Verified Pass** |
@@ -12048,7 +12049,11 @@ export async function analyzeDocument(document: Document): Promise<DocumentAnaly
 
   // 2. Build isolated prompt with bounded context
   const boundedText = document.rawText.slice(0, MAX_EXTRACTED_CHARACTERS);
-  const systemInstruction = `You are LexiGuard, an evidence-grounded legal assistant. Analyze the legal document for material risks, obligations, deadlines, and unusual terms. Every finding, obligation, and deadline must include exact quoted excerpts.`;
+  const systemInstruction = `You are LexiGuard, an evidence-grounded legal assistant. Analyze the legal document for material risks, obligations, deadlines, and unusual terms. Every finding, obligation, and deadline must include exact quoted excerpts.
+Return a JSON object strictly matching: { findings: AnalysisFinding[], obligations: Obligation[], deadlines: DeadlineItem[] }.
+Each finding: { id: string, category: string, severity: 'HIGH_ATTENTION' | 'REVIEW_SOON' | 'LOW_CONCERN' | 'INFORMATIONAL', title: string, plainLanguageSummary: string, whyItMatters: string, affectedParty: string, recommendedQuestion: string, confidence: 'DIRECTLY_STATED' | 'STRONGLY_IMPLIED', isVerified: boolean, sourceSpans: [{ clauseId: string, exactQuotedText: string, startOffset: number, endOffset: number, claimType: 'DOCUMENT_FACT', confidenceState: 'DIRECTLY_STATED', evidenceSufficiencyState: 'SUFFICIENT' }] }.
+Each obligation: { id: string, actor: string, obligation: string, trigger: string, deadline: string, status: 'MANDATORY' | 'CONDITIONAL', sourceSpan: { clauseId: string, exactQuotedText: string, startOffset: number, endOffset: number, claimType: 'DOCUMENT_FACT', confidenceState: 'DIRECTLY_STATED', evidenceSufficiencyState: 'SUFFICIENT' } }.
+Each deadline: { id: string, title: string, dueDateOrPeriod: string, type: 'NOTICE_PERIOD' | 'PAYMENT_DUE_DATE' | 'TERMINATION_NOTICE' | 'OTHER', actor: string, consequencesOfMissing: string, isCalendarDate: boolean, sourceSpan: { clauseId: string, exactQuotedText: string, startOffset: number, endOffset: number, claimType: 'DOCUMENT_FACT', confidenceState: 'DIRECTLY_STATED', evidenceSufficiencyState: 'SUFFICIENT' } }.`;
   const userGoal = `Analyze this document for material legal risks, mandatory obligations, and key deadlines. Document ID: ${document.id} Version: ${document.versionId}`;
   const isolatedPrompt = buildIsolatedPrompt(systemInstruction, userGoal, boundedText);
 
@@ -12260,7 +12265,9 @@ export async function compareContracts(
   docA: Document,
   docB: Document
 ): Promise<DocumentComparisonResult> {
-  const systemInstruction = `You are LexiGuard. Compare two versions of an agreement (Version A vs Version B). Perform structural alignment, identify substantive differences at the clause level, and classify materiality. Use cautious language such as "Potentially material difference for review" and never state that a clause is legally invalid. Every finding must include exact quoted excerpts from the relevant version.`;
+  const systemInstruction = `You are LexiGuard. Compare two versions of an agreement (Version A vs Version B). Perform structural alignment, identify substantive differences at the clause level, and classify materiality. Use cautious language such as "Potentially material difference for review" and never state that a clause is legally invalid. Every finding must include exact quoted excerpts from the relevant version.
+Return a JSON object matching: { findings: ComparisonFinding[], summary: string, unchangedCount: number, addedCount: number, removedCount: number, modifiedCount: number }.
+Each finding: { id: string, clauseTopic: string, changeType: 'UNCHANGED' | 'ADDED' | 'REMOVED' | 'MODIFIED' | 'MOVED' | 'AMBIGUOUS', materiality: string, severity: 'HIGH_ATTENTION' | 'REVIEW_SOON' | 'LOW_CONCERN' | 'INFORMATIONAL', originalText?: string, revisedText?: string, plainLanguageExplanation: string, commercialImpact: string, sourceSpans: EvidenceSpan[] }.`;
 
   function normalizeTokenSet(text: string): Set<string> {
     return new Set(
@@ -12610,7 +12617,8 @@ export async function answerDocumentQuestion(
   const systemInstruction =
     'You are LexiGuard. Answer the user question using ONLY the provided clauses. ' +
     'If the answer cannot be found in those clauses, state: "Insufficient evidence in the provided document." ' +
-    'Always include exact quoted evidence and preserve the legal-information boundary.';
+    'Always include exact quoted evidence and preserve the legal-information boundary. ' +
+    'Response JSON must contain fields: question, answer (string), claimType ("DOCUMENT_FACT" | "DERIVED_INTERPRETATION" | "INSUFFICIENT_EVIDENCE"), confidence ("DIRECTLY_STATED" | "STRONGLY_IMPLIED" | "NOT_FOUND"), isEvidenceSufficient (boolean), supportingSpans (array of EvidenceSpan with clauseId, exactQuotedText, startOffset, endOffset), legalBoundaryDisclaimer (string), and suggestedQuestions (string[]).';
 
   const userGoal = `Answer: ${cleanQuestion} Document ID: ${document.id} Version: ${document.versionId}`;
 
@@ -15190,6 +15198,7 @@ const EnvironmentSchema = z
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     LLM_PROVIDER: z.enum(['mock', 'gemini']).default('mock'),
     GEMINI_API_KEY: z.string().optional(),
+    GEMINI_MODEL: z.string().default('gemini-3.6-flash'),
     MAX_UPLOAD_BYTES: z.coerce.number().positive().default(MAX_UPLOAD_BYTES),
     MAX_DOCUMENT_PAGES: z.coerce.number().positive().default(MAX_DOCUMENT_PAGES),
     MAX_EXTRACTED_CHARACTERS: z.coerce.number().positive().default(MAX_EXTRACTED_CHARACTERS),
@@ -15226,6 +15235,7 @@ export function getAppConfig(): Environment {
     NODE_ENV: process.env.NODE_ENV,
     LLM_PROVIDER: process.env.LLM_PROVIDER,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    GEMINI_MODEL: process.env.GEMINI_MODEL,
     MAX_UPLOAD_BYTES: process.env.MAX_UPLOAD_BYTES,
     MAX_DOCUMENT_PAGES: process.env.MAX_DOCUMENT_PAGES,
     MAX_EXTRACTED_CHARACTERS: process.env.MAX_EXTRACTED_CHARACTERS,
@@ -15437,7 +15447,7 @@ export class GeminiLLMProvider implements LLMProvider {
   private client: GoogleGenerativeAI;
   private modelName: string;
 
-  constructor(apiKey: string, modelName = 'gemini-1.5-flash') {
+  constructor(apiKey: string, modelName = 'gemini-3.6-flash') {
     if (!apiKey) {
       throw new GeminiProviderError('GEMINI_API_KEY is required for GeminiLLMProvider');
     }
@@ -15474,12 +15484,16 @@ export class GeminiLLMProvider implements LLMProvider {
 
         const resultPromise = model.generateContent(fullPrompt);
         const response = await Promise.race([resultPromise, timeoutPromise]);
-        const text = response.response.text();
+        const rawText = response.response.text().trim();
+        const jsonText = rawText
+          .replace(/^```(?:json)?\s*/i, '')
+          .replace(/\s*```$/i, '')
+          .trim();
 
         // Parse and validate with Zod
         let parsedJson: unknown;
         try {
-          parsedJson = JSON.parse(text);
+          parsedJson = JSON.parse(jsonText);
         } catch (jsonErr) {
           lastError = new GeminiProviderError('Model did not return valid JSON syntax');
           continue; // Retry if JSON syntax was malformed
@@ -16595,7 +16609,7 @@ export function getLLMProvider(): LLMProvider {
   const config = getAppConfig();
 
   if (config.LLM_PROVIDER === 'gemini' && config.GEMINI_API_KEY) {
-    currentProvider = new GeminiLLMProvider(config.GEMINI_API_KEY);
+    currentProvider = new GeminiLLMProvider(config.GEMINI_API_KEY, config.GEMINI_MODEL);
     return currentProvider;
   }
 
@@ -17920,8 +17934,8 @@ export const MAX_CONCURRENT_WAITERS = 32;
 export const MAX_INDEXED_CHUNKS = 4_000;
 export const MAX_DOCUMENT_PAGES = 50;
 export const MAX_RETRIEVAL_TOP_K = 8;
-export const MAX_OUTPUT_TOKENS = 2_048;
-export const OPERATION_TIMEOUT_MS = 15_000;
+export const MAX_OUTPUT_TOKENS = 8_192;
+export const OPERATION_TIMEOUT_MS = 30_000;
 export const RATE_LIMIT_PER_MINUTE = 30;
 export const MIN_TEXT_CHARACTERS_FOR_SCANNED_CHECK = 100;
 
@@ -19701,6 +19715,17 @@ describe('Environment Configuration (Fail-Closed Validation)', () => {
     process.env.LLM_PROVIDER = 'unsupported-provider';
 
     expect(() => getAppConfig()).toThrow(/Invalid application configuration/);
+  });
+
+  it('defaults GEMINI_MODEL to gemini-3.6-flash and allows custom model override', () => {
+    delete process.env.GEMINI_MODEL;
+    const configDefault = getAppConfig();
+    expect(configDefault.GEMINI_MODEL).toBe('gemini-3.6-flash');
+
+    resetAppConfigForTesting();
+    process.env.GEMINI_MODEL = 'gemini-3.7-flash';
+    const configCustom = getAppConfig();
+    expect(configCustom.GEMINI_MODEL).toBe('gemini-3.7-flash');
   });
 });
 ```

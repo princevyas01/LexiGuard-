@@ -40,7 +40,11 @@ export async function analyzeDocument(document: Document): Promise<DocumentAnaly
 
   // 2. Build isolated prompt with bounded context
   const boundedText = document.rawText.slice(0, MAX_EXTRACTED_CHARACTERS);
-  const systemInstruction = `You are LexiGuard, an evidence-grounded legal assistant. Analyze the legal document for material risks, obligations, deadlines, and unusual terms. Every finding, obligation, and deadline must include exact quoted excerpts.`;
+  const systemInstruction = `You are LexiGuard, an evidence-grounded legal assistant. Analyze the legal document for material risks, obligations, deadlines, and unusual terms. Every finding, obligation, and deadline must include exact quoted excerpts.
+Return a JSON object strictly matching: { findings: AnalysisFinding[], obligations: Obligation[], deadlines: DeadlineItem[] }.
+Each finding: { id: string, category: string, severity: 'HIGH_ATTENTION' | 'REVIEW_SOON' | 'LOW_CONCERN' | 'INFORMATIONAL', title: string, plainLanguageSummary: string, whyItMatters: string, affectedParty: string, recommendedQuestion: string, confidence: 'DIRECTLY_STATED' | 'STRONGLY_IMPLIED', isVerified: boolean, sourceSpans: [{ clauseId: string, exactQuotedText: string, startOffset: number, endOffset: number, claimType: 'DOCUMENT_FACT', confidenceState: 'DIRECTLY_STATED', evidenceSufficiencyState: 'SUFFICIENT' }] }.
+Each obligation: { id: string, actor: string, obligation: string, trigger: string, deadline: string, status: 'MANDATORY' | 'CONDITIONAL', sourceSpan: { clauseId: string, exactQuotedText: string, startOffset: number, endOffset: number, claimType: 'DOCUMENT_FACT', confidenceState: 'DIRECTLY_STATED', evidenceSufficiencyState: 'SUFFICIENT' } }.
+Each deadline: { id: string, title: string, dueDateOrPeriod: string, type: 'NOTICE_PERIOD' | 'PAYMENT_DUE_DATE' | 'TERMINATION_NOTICE' | 'OTHER', actor: string, consequencesOfMissing: string, isCalendarDate: boolean, sourceSpan: { clauseId: string, exactQuotedText: string, startOffset: number, endOffset: number, claimType: 'DOCUMENT_FACT', confidenceState: 'DIRECTLY_STATED', evidenceSufficiencyState: 'SUFFICIENT' } }.`;
   const userGoal = `Analyze this document for material legal risks, mandatory obligations, and key deadlines. Document ID: ${document.id} Version: ${document.versionId}`;
   const isolatedPrompt = buildIsolatedPrompt(systemInstruction, userGoal, boundedText);
 

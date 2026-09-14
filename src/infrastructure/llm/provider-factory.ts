@@ -17,7 +17,7 @@ export function getLLMProvider(): LLMProvider {
   const config = getAppConfig();
 
   if (config.LLM_PROVIDER === 'gemini' && config.GEMINI_API_KEY) {
-    currentProvider = new GeminiLLMProvider(config.GEMINI_API_KEY);
+    currentProvider = new GeminiLLMProvider(config.GEMINI_API_KEY, config.GEMINI_MODEL);
     return currentProvider;
   }
 

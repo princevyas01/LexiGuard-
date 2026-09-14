@@ -26,7 +26,9 @@ export async function compareContracts(
   docA: Document,
   docB: Document
 ): Promise<DocumentComparisonResult> {
-  const systemInstruction = `You are LexiGuard. Compare two versions of an agreement (Version A vs Version B). Perform structural alignment, identify substantive differences at the clause level, and classify materiality. Use cautious language such as "Potentially material difference for review" and never state that a clause is legally invalid. Every finding must include exact quoted excerpts from the relevant version.`;
+  const systemInstruction = `You are LexiGuard. Compare two versions of an agreement (Version A vs Version B). Perform structural alignment, identify substantive differences at the clause level, and classify materiality. Use cautious language such as "Potentially material difference for review" and never state that a clause is legally invalid. Every finding must include exact quoted excerpts from the relevant version.
+Return a JSON object matching: { findings: ComparisonFinding[], summary: string, unchangedCount: number, addedCount: number, removedCount: number, modifiedCount: number }.
+Each finding: { id: string, clauseTopic: string, changeType: 'UNCHANGED' | 'ADDED' | 'REMOVED' | 'MODIFIED' | 'MOVED' | 'AMBIGUOUS', materiality: string, severity: 'HIGH_ATTENTION' | 'REVIEW_SOON' | 'LOW_CONCERN' | 'INFORMATIONAL', originalText?: string, revisedText?: string, plainLanguageExplanation: string, commercialImpact: string, sourceSpans: EvidenceSpan[] }.`;
 
   function normalizeTokenSet(text: string): Set<string> {
     return new Set(

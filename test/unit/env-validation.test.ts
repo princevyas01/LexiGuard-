@@ -33,4 +33,15 @@ describe('Environment Configuration (Fail-Closed Validation)', () => {
 
     expect(() => getAppConfig()).toThrow(/Invalid application configuration/);
   });
+
+  it('defaults GEMINI_MODEL to gemini-3.6-flash and allows custom model override', () => {
+    delete process.env.GEMINI_MODEL;
+    const configDefault = getAppConfig();
+    expect(configDefault.GEMINI_MODEL).toBe('gemini-3.6-flash');
+
+    resetAppConfigForTesting();
+    process.env.GEMINI_MODEL = 'gemini-3.7-flash';
+    const configCustom = getAppConfig();
+    expect(configCustom.GEMINI_MODEL).toBe('gemini-3.7-flash');
+  });
 });

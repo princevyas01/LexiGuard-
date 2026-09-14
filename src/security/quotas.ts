@@ -17,8 +17,8 @@ export const MAX_CONCURRENT_WAITERS = 32;
 export const MAX_INDEXED_CHUNKS = 4_000;
 export const MAX_DOCUMENT_PAGES = 50;
 export const MAX_RETRIEVAL_TOP_K = 8;
-export const MAX_OUTPUT_TOKENS = 2_048;
-export const OPERATION_TIMEOUT_MS = 15_000;
+export const MAX_OUTPUT_TOKENS = 8_192;
+export const OPERATION_TIMEOUT_MS = 30_000;
 export const RATE_LIMIT_PER_MINUTE = 30;
 export const MIN_TEXT_CHARACTERS_FOR_SCANNED_CHECK = 100;
 
