@@ -1,0 +1,31 @@
+RESIDENTIAL LEASE AGREEMENT
+
+This Residential Lease Agreement ("Agreement") is made and entered into as of January 15, 2025, by and between Oakridge Properties LLC ("Landlord") and Jane Doe ("Tenant").
+
+1. PREMISES AND TERM
+1.1 Premises: Landlord hereby leases to Tenant the real property located at 404 Elm Street, Apt 3B, Metropolis ("Premises").
+1.2 Term: The lease term shall commence on February 1, 2025, and continue until January 31, 2026 ("Term").
+1.3 Automatic Renewal: Upon expiration of the initial Term, this Agreement shall automatically renew for successive one-year terms unless Tenant provides written notice of termination at least fifteen (15) days prior to the expiration date.
+
+2. RENT AND PAYMENTS
+2.1 Monthly Rent: Tenant shall pay Landlord a monthly rent of $2,400.00, due on the first day of each calendar month.
+2.2 Late Fee: If rent is not received by Landlord by 11:59 PM on the second day of the month, Tenant shall pay an immediate late penalty fee of $250.00, plus an additional penalty of $50.00 per calendar day until paid in full.
+2.3 Payment Method: Rent must be paid via Landlord's designated online portal. Tenant is responsible for all third-party processing transaction fees.
+
+3. LANDLORD ENTRY AND INSPECTIONS
+3.1 Access: Landlord and Landlord's agents reserve the right to enter the Premises at any time, with or without prior notice, for purposes of inspection, maintenance, repairs, or showing the property to prospective buyers or tenants.
+
+4. MAINTENANCE AND ALTERATIONS
+4.1 Tenant Obligations: Tenant must maintain the Premises in good and sanitary condition. Tenant is strictly prohibited from making any alterations, painting walls, or installing fixtures without Landlord's prior written consent.
+4.2 Repair Costs: Tenant shall be solely responsible for all repair costs under $500.00, regardless of fault or origin of damage, including plumbing clogs and heating repairs.
+
+5. UNILATERAL MODIFICATION
+5.1 Rule Changes: Landlord reserves the exclusive right to unilaterally amend property rules, common area policies, utility allocations, and fee schedules at any time upon five (5) days' written electronic notice to Tenant.
+
+6. GOVERNING LAW AND DISPUTE RESOLUTION
+6.1 Governing Law: This Agreement shall be governed by the laws of the State of New York.
+6.2 Arbitration and Class Action Waiver: Any dispute arising out of or relating to this Agreement must be resolved through binding individual arbitration administered by the American Arbitration Association in New York, NY. Tenant knowingly and irrevocably waives all rights to participate in class actions or jury trials.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement.
+Landlord: Oakridge Properties LLC
+Tenant: Jane Doe

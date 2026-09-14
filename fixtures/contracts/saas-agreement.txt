@@ -1,0 +1,26 @@
+MASTER SOFTWARE AS A SERVICE (SAAS) AGREEMENT
+
+This Master SaaS Agreement ("Agreement") is entered into on March 1, 2025, by and between CloudSync Technologies Inc. ("Provider") and Acme Enterprises LLC ("Customer").
+
+1. SUBSCRIPTION SERVICES AND ACCESS
+1.1 License Grant: Provider grants Customer a non-exclusive, non-transferable right to access and use the CloudSync Platform solely for internal business operations during the Subscription Term.
+1.2 Restrictions: Customer shall not reverse engineer, decompile, copy, or create derivative works based on the Platform.
+
+2. FEES, BILLING, AND UNILATERAL PRICE INCREASES
+2.1 Subscription Fees: Customer shall pay Provider the annual subscription fee of $48,000.00 within thirty (30) days of invoice date.
+2.2 Price Adjustments: Provider reserves the right to unilaterally adjust subscription pricing and tier allocations at any time upon thirty (30) days' notice, with price increases taking effect automatically on the subsequent billing cycle unless Customer terminates thirty (30) days prior.
+
+3. DATA RIGHTS AND ARTIFICIAL INTELLIGENCE
+3.1 Customer Data: Customer owns all raw data uploaded to the Platform.
+3.2 Derivative AI Rights: Customer hereby grants Provider an irrevocable, perpetual, worldwide, royalty-free license to ingest, analyze, aggregate, and train machine learning models and artificial intelligence systems using all Customer Data and query logs.
+
+4. LIMITATION OF LIABILITY AND INDEMNIFICATION
+4.1 Provider Liability Limitation: IN NO EVENT SHALL PROVIDER'S TOTAL AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT EXCEED ONE HUNDRED DOLLARS ($100.00), REGARDLESS OF THE THEORY OF LIABILITY OR GROSS NEGLIGENCE.
+4.2 Customer Liability: Customer agrees to indemnify, defend, and hold harmless Provider from any and all third-party claims, liabilities, losses, damages, and legal costs arising from Customer's use of the Platform without limitation of liability.
+
+5. TERM AND TERMINATION
+5.1 Term: This Agreement is effective for three (3) years and automatically renews for consecutive one-year terms unless either party gives ninety (90) days' notice.
+5.2 Termination for Convenience: Provider may terminate this Agreement for any reason or no reason upon fifteen (15) days' written notice to Customer. Customer possesses no right of termination for convenience.
+
+6. GOVERNING LAW AND JURISDICTION
+6.1 Governing Law: This Agreement shall be governed by Delaware law without regard to conflict of laws principles. Exclusive venue shall lie in Wilmington, Delaware.
