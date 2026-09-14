@@ -8,7 +8,7 @@ import { globalRateLimiter } from '@/security/rate-limiter';
 import { extractClientIdentity } from '@/security/request-identity';
 import {
   SampleRequestSchema,
-  enforceRequestBodySizeLimit,
+  createBoundedBodyRequest,
   parseBoundedJson,
 } from '@/security/request-schemas';
 import { ConcurrencyLimitError, globalConcurrencyGate } from '@/security/concurrency-gate';
@@ -62,17 +62,15 @@ export async function POST(req: NextRequest) {
 
     // B. File Upload (FormData)
     if (contentType.includes('multipart/form-data')) {
-      enforceRequestBodySizeLimit(req);
-      const formData = await req.formData();
+      const boundedRequest = createBoundedBodyRequest(req);
+      const formData = await boundedRequest.formData();
       const file = formData.get('file') as File | null;
 
       if (!file) {
         return NextResponse.json({ error: 'No file was provided in the upload.' }, { status: 400 });
       }
 
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-
+      const buffer = Buffer.from(await file.arrayBuffer());
       const validation = validateUploadedFile(buffer, file.name, file.type);
       const document = await globalConcurrencyGate.run(async () => {
         const parsedDocument = await parseDocument(buffer, validation);
