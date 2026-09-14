@@ -78,4 +78,10 @@ export class InMemoryDocumentStore {
   }
 }
 
-export const documentStore = new InMemoryDocumentStore();
+const globalForStore = globalThis as unknown as {
+  documentStore?: InMemoryDocumentStore;
+};
+
+export const documentStore = globalForStore.documentStore ?? new InMemoryDocumentStore();
+
+globalForStore.documentStore = documentStore;

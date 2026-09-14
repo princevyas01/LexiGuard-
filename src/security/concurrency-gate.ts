@@ -1,4 +1,4 @@
-﻿import { MAX_CONCURRENT_JOBS, MAX_CONCURRENT_WAITERS } from './quotas';
+import { MAX_CONCURRENT_JOBS, MAX_CONCURRENT_WAITERS } from './quotas';
 
 export class ConcurrencyLimitError extends Error {
   constructor(message = 'Server is temporarily busy. Please retry shortly.') {
@@ -80,4 +80,11 @@ export class AsyncConcurrencyGate {
   }
 }
 
-export const globalConcurrencyGate = new AsyncConcurrencyGate();
+const globalForGate = globalThis as unknown as {
+  globalConcurrencyGate?: AsyncConcurrencyGate;
+};
+
+export const globalConcurrencyGate =
+  globalForGate.globalConcurrencyGate ?? new AsyncConcurrencyGate();
+
+globalForGate.globalConcurrencyGate = globalConcurrencyGate;
